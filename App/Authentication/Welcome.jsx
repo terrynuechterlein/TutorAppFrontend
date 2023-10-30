@@ -1,21 +1,26 @@
 import {View, Text, Pressable} from "react-native";
 import React from "react";
 import {LinearGradient} from "expo-linear-gradient";
-import COLORS from "../Constants/colors";
+import COLORS from "../../Constants/colors";
 import {Image} from "react-native";
-import {Button, OrangeButton} from "../Components/Button";
+import {Button, OrangeButton} from "../../Components/Button";
 
-const Welcome = ({navigation}) => {
+export default function Welcome ({navigation}){
   return (
     <LinearGradient
       style={{
         flex: 1,
       }}
       colors={[COLORS.torquoise, COLORS.purple]}>
-      <View style={{flex: 1, justifyContent: 'space-between'}}>
-        <View style={{ justifyContent: 'center', alignItems: 'center', paddingTop: 30 }}>
+      <View style={{flex: 1, justifyContent: "space-between"}}>
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            paddingTop: 30,
+          }}>
           <Image
-            source={require("../assets/hornetLogo2.png")}
+            source={require("../../assets/hornetLogo2.png")}
             style={{width: 200, height: 200}}
           />
         </View>
@@ -25,7 +30,6 @@ const Welcome = ({navigation}) => {
             position: "absolute",
             top: 400,
             width: "100%",
-
           }}>
           <Text
             style={{
@@ -61,42 +65,41 @@ const Welcome = ({navigation}) => {
               and find a tutor near you!
             </Text>
           </View>
-          <OrangeButton 
+          <OrangeButton
             title="Join Now"
-            onPress={()=>navigation.navigate("SignUp")} 
+            onPress={() => navigation.navigate("SignUp")}
             style={{
               marginTop: 22,
               width: "100%",
-            }} 
-            
-            />
-            <View style={{
-              flexDirection:'row',
+            }}
+          />
+          <View
+            style={{
+              flexDirection: "row",
               marginTop: 12,
-              justifyContent: 'center'
+              justifyContent: "center",
             }}>
-              <Text style={{
+            <Text
+              style={{
                 fontSize: 16,
                 color: COLORS.white,
               }}>
-                Already have an account ?
-              </Text>
-              <Pressable
-              onPress={()=>navigation.navigate("Login")}
-              >
-                <Text style={{
+              Already have an account ?
+            </Text>
+            <Pressable onPress={() => navigation.navigate("Login")}>
+              <Text
+                style={{
                   fontSize: 16,
                   color: COLORS.yellow,
                   fontWeight: "bold",
-                  marginLeft: 4
-                }}>Login</Text>
-
-              </Pressable>
-            </View>
+                  marginLeft: 4,
+                }}>
+                Login
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </View>
     </LinearGradient>
   );
 };
-
-export default Welcome;

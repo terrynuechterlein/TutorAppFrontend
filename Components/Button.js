@@ -41,6 +41,17 @@ export const OrangeButton = (props) => {
   );
 };
 
+export const CreativeButton = (props) => {
+  return (
+    <TouchableOpacity
+      style={[styles.creativeButton, props.style]}
+      onPress={props.onPress}
+      activeOpacity={0.8}>
+      <Text style={[styles.creativeButtonText, { color: props.textColor || '#ffffff' }]}>{props.title}</Text>
+    </TouchableOpacity>
+  );
+};
+
 const styles = StyleSheet.create({
   button: {
     paddingBottom: 16,
@@ -48,6 +59,24 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
+  },
+  creativeButton: {
+    backgroundColor: '#ff8c00',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 3,
+    shadowColor: '#ff8c00',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+  },
+  creativeButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });
 export default Button;

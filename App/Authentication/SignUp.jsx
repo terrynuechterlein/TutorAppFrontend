@@ -10,12 +10,11 @@ import {
   Switch,
   TouchableOpacity,
 } from "react-native";
-import COLORS from "../Constants/colors";
+import COLORS from "../../Constants/colors";
 import {Picker} from "@react-native-picker/picker";
 import {LinearGradient} from "expo-linear-gradient";
 import {Image} from "react-native";
-import HornetLogo from "../assets/hornetLogo2.png";
-import {Button, OrangeButton} from "../Components/Button";
+import {Button, OrangeButton} from "../../Components/Button";
 import {Ionicons} from "@expo/vector-icons";
 
 export default function SignUp({navigation}) {
@@ -62,7 +61,7 @@ export default function SignUp({navigation}) {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={{flex: 1}}>
         <ImageBackground
-          source={require("../assets/tutors2.jpg")}
+          source={require("../../assets/tutors2.jpg")}
           style={{flex: 1}}
           resizeMode="cover">
           {/* Making gradient overlay less opaque to let the image show through */}
