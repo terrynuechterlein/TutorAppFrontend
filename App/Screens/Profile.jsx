@@ -10,10 +10,13 @@ import {
   ScrollView,
   Keyboard,
 } from "react-native";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Button, {OrangeButton, CreativeButton} from "../../Components/Button"; // Update this path
+import Button, {OrangeButton, CreativeButton} from "../../Components/Button";
 import DoodlePaper from "../../Components/DoodlePaper";
 import ProfileStats from "../../Components/ProfileStats";
+import ProfileModal from "../../Components/ProfileModal";
+import FlashMessage from "react-native-flash-message";
+import {Ionicons, FontAwesome} from "@expo/vector-icons";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 export default function Profile() {
   const [bio, setBio] = useState("");
@@ -25,6 +28,7 @@ export default function Profile() {
   const [postsCount, setPostsCount] = useState(0);
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleChooseImage = (setImage) => {
     const options = {
@@ -65,13 +69,38 @@ export default function Profile() {
     setShowDoodlePaper(true);
   };
 
+  const handleCameraIconPress = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleSettingsPress = () => {
+    console.log('Settings Icon Pressed');
+    // Add the logic for handling settings icon press here
+  };
+
+  const handleImageTaken = (imageUri) => {
+    setProfileImage(imageUri);
+  };
+
   return (
     <ScrollView style={styles.container}>
       <TouchableOpacity
         onPress={() => handleChooseImage(setBannerImage)}
         style={styles.bannerContainer}>
+         <TouchableOpacity 
+          onPress={() => handleChooseImage(setBannerImage)} 
+          style={[styles.iconWrapper, styles.pencilIconWrapper]}
+        >
+          <FontAwesome5 name="pencil-alt" size={24} color="#FFF" />
+        </TouchableOpacity>
+        <TouchableOpacity 
+          onPress={handleSettingsPress} 
+          style={[styles.iconWrapper, styles.gearIconWrapper]}
+        >
+          <FontAwesome name="gear" size={24} color="#FFF" />
+        </TouchableOpacity>
         <Image
-          source={bannerImage || require("../../assets/defaultBanner.jpg")}
+          source={bannerImage || require("../../assets/Study.png")}
           style={styles.banner}
         />
       </TouchableOpacity>
@@ -81,10 +110,15 @@ export default function Profile() {
           <TouchableOpacity onPress={() => handleChooseImage(setProfileImage)}>
             <View style={styles.profileImageContainer}>
               <Image
-                source={profileImage || require("../../assets/hornetLogo2.png")}
+                source={profileImage || require("../../assets/penguin.png")}
                 style={styles.profileImage}
                 resizeMode="cover"
               />
+              <TouchableOpacity
+                onPress={handleCameraIconPress}
+                style={styles.cameraIcon}>
+                <Ionicons name="camera" size={24} color="#000" />
+              </TouchableOpacity>
             </View>
           </TouchableOpacity>
           <Text style={styles.username}>Username</Text>
@@ -138,11 +172,13 @@ export default function Profile() {
           </View>
         )}
       </View>
-      <OrangeButton
-        title="Log Out"
-        onPress={() => {}}
-        style={styles.logoutButton}
-      />
+
+      <ProfileModal
+      isVisible={isModalVisible}
+      onClose={() => setIsModalVisible(false)}
+      onImageTaken={handleImageTaken}
+    />
+      <FlashMessage position="top" />
     </ScrollView>
   );
 }
@@ -172,13 +208,19 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 3,
     borderColor: "#00ffff",
-    justifyContent: 'center', // Center the image
-    alignItems: 'center', // Center the image
+    justifyContent: "center",
+    alignItems: "center",
   },
   profileImage: {
     width: "100%",
     height: "100%",
     aspectRatio: 1,
+  },
+  cameraIcon: {
+    position: "absolute",
+    right: 10,
+    bottom: 10,
+    zIndex: 50,
   },
   username: {
     color: "#ffffff",
@@ -252,5 +294,31 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  pencilIcon: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    zIndex: 10,
+  },
+  gearIcon: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 10,
+  },
+  pencilIconWrapper: {
+    top: 10,
+    left: 10,
+  },
+  gearIconWrapper: {
+    top: 10,
+    right: 10,
+  },
+  iconWrapper: {
+    position: 'absolute',
+    zIndex: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Change the rgba values according to your preference
+    padding: 8, // Adjust as necessary
   },
 });
