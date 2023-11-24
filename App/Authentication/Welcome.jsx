@@ -3,9 +3,9 @@ import React from "react";
 import {LinearGradient} from "expo-linear-gradient";
 import COLORS from "../../Constants/colors";
 import {Image} from "react-native";
-import {Button, OrangeButton} from "../../Components/Button";
+import {Button, OrangeButton} from "../../Constants/Button";
 
-export default function Welcome ({navigation}){
+export default function Welcome({navigation}) {
   return (
     <LinearGradient
       style={{
@@ -102,4 +102,4 @@ export default function Welcome ({navigation}){
       </View>
     </LinearGradient>
   );
-};
+}

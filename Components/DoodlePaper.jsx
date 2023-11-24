@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     color: '#000',
     textAlign: 'center',
     position: 'absolute',
-    top: 15, // Adjust as needed to align text with the first line
+    top: 15, 
     left: 10,
     right: 10,
   },

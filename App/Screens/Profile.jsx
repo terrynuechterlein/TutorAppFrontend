@@ -10,7 +10,11 @@ import {
   ScrollView,
   Keyboard,
 } from "react-native";
-import Button, {OrangeButton, CreativeButton} from "../../Components/Button";
+import Button, {
+  OrangeButton,
+  CreativeButton,
+  EditProfileButton,
+} from "../../Constants/Button";
 import DoodlePaper from "../../Components/DoodlePaper";
 import ProfileStats from "../../Components/ProfileStats";
 import ProfileModal from "../../Components/ProfileModal";
@@ -18,7 +22,7 @@ import FlashMessage from "react-native-flash-message";
 import {Ionicons, FontAwesome} from "@expo/vector-icons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
-export default function Profile() {
+export default function Profile({navigation}) {
   const [bio, setBio] = useState("");
   const [savedBio, setSavedBio] = useState("");
   const [profileImage, setProfileImage] = useState(null);
@@ -74,12 +78,58 @@ export default function Profile() {
   };
 
   const handleSettingsPress = () => {
-    console.log('Settings Icon Pressed');
-    // Add the logic for handling settings icon press here
+    console.log("Settings Icon Pressed");
   };
 
-  const handleImageTaken = (imageUri) => {
-    setProfileImage(imageUri);
+  const handleImageTaken = async (uri) => {
+    setProfileImage({uri}); // Set the new image as the profile picture
+    await uploadImage(uri);
+  };
+
+  const uploadImage = async (uri) => {
+    const uriParts = uri.split(".");
+    const fileType = uriParts[uriParts.length - 1];
+
+    const formData = new FormData();
+    formData.append("profileImage", {
+      uri: uri,
+      name: `photo.${fileType}`,
+      type: `image/${fileType}`,
+    });
+
+    try {
+      const response = await fetch(
+        "http://10.2.1.246:5016/api/tutors/uploadProfilePicture",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          body: formData,
+        }
+      );
+
+      if (response.ok) {
+        const responseData = await response.json();
+        // Update state with new profile picture URL
+        setProfileImage({uri: responseData.profilePictureUrl});
+      } else {
+        const errorData = await response.json();
+        console.error("Upload failed:", errorData);
+        showMessage({
+          message: "Upload failed",
+          description: errorData.message || "The image could not be uploaded.",
+          type: "danger",
+        });
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      showMessage({
+        message: "Upload error",
+        description: "An unexpected error occurred.",
+        type: "danger",
+      });
+    }
   };
 
   return (
@@ -87,16 +137,14 @@ export default function Profile() {
       <TouchableOpacity
         onPress={() => handleChooseImage(setBannerImage)}
         style={styles.bannerContainer}>
-         <TouchableOpacity 
-          onPress={() => handleChooseImage(setBannerImage)} 
-          style={[styles.iconWrapper, styles.pencilIconWrapper]}
-        >
+        <TouchableOpacity
+          onPress={() => handleChooseImage(setBannerImage)}
+          style={[styles.iconWrapper, styles.pencilIconWrapper]}>
           <FontAwesome5 name="pencil-alt" size={24} color="#FFF" />
         </TouchableOpacity>
-        <TouchableOpacity 
-          onPress={handleSettingsPress} 
-          style={[styles.iconWrapper, styles.gearIconWrapper]}
-        >
+        <TouchableOpacity
+          onPress={handleSettingsPress}
+          style={[styles.iconWrapper, styles.gearIconWrapper]}>
           <FontAwesome name="gear" size={24} color="#FFF" />
         </TouchableOpacity>
         <Image
@@ -124,11 +172,8 @@ export default function Profile() {
           <Text style={styles.username}>Username</Text>
           <Text style={styles.schoolInfo}>School - Year</Text>
         </View>
-        <ProfileStats
-          posts={postsCount}
-          followers={followersCount}
-          following={followingCount}
-        />
+
+        <EditProfileButton onPress={() => navigation.navigate("EditProfile")} />
       </View>
 
       <View style={styles.bioContainer}>
@@ -174,10 +219,10 @@ export default function Profile() {
       </View>
 
       <ProfileModal
-      isVisible={isModalVisible}
-      onClose={() => setIsModalVisible(false)}
-      onImageTaken={handleImageTaken}
-    />
+        isVisible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onImageTaken={handleImageTaken}
+      />
       <FlashMessage position="top" />
     </ScrollView>
   );
@@ -316,9 +361,9 @@ const styles = StyleSheet.create({
     right: 10,
   },
   iconWrapper: {
-    position: 'absolute',
+    position: "absolute",
     zIndex: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Change the rgba values according to your preference
-    padding: 8, // Adjust as necessary
+    backgroundColor: "rgba(0, 0, 0, 0.3)", 
+    padding: 8, 
   },
 });

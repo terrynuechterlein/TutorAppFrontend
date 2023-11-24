@@ -14,7 +14,7 @@ import COLORS from "../../Constants/colors";
 import {Picker} from "@react-native-picker/picker";
 import {LinearGradient} from "expo-linear-gradient";
 import {Image} from "react-native";
-import {Button, OrangeButton} from "../../Components/Button";
+import {Button, OrangeButton} from "../../Constants/Button";
 import {Ionicons} from "@expo/vector-icons";
 
 export default function SignUp({navigation}) {
@@ -49,7 +49,7 @@ export default function SignUp({navigation}) {
         // Navigate to the Login page
         navigation.navigate("Login");
       } else {
-        // Handle any errors here (e.g., show a message to the user)
+        // Handle errors
         console.error("Error during registration:", json);
       }
     } catch (error) {
@@ -69,7 +69,7 @@ export default function SignUp({navigation}) {
             style={{flex: 1}}
             colors={[
               `${COLORS.torquoise}AA`, // adding AA for 2/3 opacity
-              `${COLORS.purple}AA`, // adding AA for 2/3 opacity
+              `${COLORS.purple}AA`,
             ]}
             start={{x: 0, y: 0}}
             end={{x: 1, y: 1}}>

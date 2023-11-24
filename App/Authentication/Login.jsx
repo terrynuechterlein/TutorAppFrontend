@@ -10,12 +10,17 @@ import {
 import {React, useState} from "react";
 import {LinearGradient} from "expo-linear-gradient";
 import COLORS from "../../Constants/colors";
-import {Button, OrangeButton} from "../../Components/Button";
+import {Button, OrangeButton} from "../../Constants/Button";
 import {Ionicons} from "@expo/vector-icons";
+import * as SecureStore from "expo-secure-store";
 
 export default function Login({navigation}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  async function save(key, value) {
+    await SecureStore.setItemAsync(key, value);
+  }
 
   const handleLogin = async () => {
     const userData = {
@@ -32,17 +37,17 @@ export default function Login({navigation}) {
         body: JSON.stringify(userData),
       });
 
-      // Check if response has data before parsing
-      const responseBody = await response.text();
-      let json = responseBody ? JSON.parse(responseBody) : {};
-
-      // Check for successful registration
+      // Check for successful login
       if (response.ok) {
+        const json = await response.json(); 
+        await save("userToken", json.token); // Save the token
+
         // Navigate to the Dashboard
-        navigation.navigate("App");
+        navigation.navigate("AppTabs");
       } else {
-        // Handle any errors here (e.g., show a message to the user)
-        console.error("Error during login:", json);
+        // If the response is not ok, log the entire response for debugging
+        const responseBody = await response.text();
+        console.error("Error during login:", responseBody);
       }
     } catch (error) {
       console.error("Error during login:", error.message);
@@ -61,7 +66,7 @@ export default function Login({navigation}) {
             style={{flex: 1}}
             colors={[
               `${COLORS.torquoise}AA`, // adding AA for 2/3 opacity
-              `${COLORS.purple}AA`, // adding AA for 2/3 opacity
+              `${COLORS.purple}AA`, 
             ]}
             start={{x: 0, y: 0}}
             end={{x: 1, y: 1}}>

@@ -1,6 +1,6 @@
 import {View, Text, TouchableOpacity} from "react-native";
 import React from "react";
-import COLORS from "../Constants/colors";
+import COLORS from "./colors";
 import {StyleSheet} from "react-native";
 
 const Button = (props) => {
@@ -47,7 +47,42 @@ export const CreativeButton = (props) => {
       style={[styles.creativeButton, props.style]}
       onPress={props.onPress}
       activeOpacity={0.8}>
-      <Text style={[styles.creativeButtonText, { color: props.textColor || '#ffffff' }]}>{props.title}</Text>
+      <Text
+        style={[
+          styles.creativeButtonText,
+          {color: props.textColor || "#ffffff"},
+        ]}>
+        {props.title}
+      </Text>
+    </TouchableOpacity>
+  );
+};
+
+export const EditProfileButton = (props) => {
+  const [isPressed, setIsPressed] = React.useState(false);
+
+  const handlePressIn = () => {
+    setIsPressed(true);
+  };
+
+  const handlePressOut = () => {
+    setIsPressed(false);
+  };
+
+  return (
+    <TouchableOpacity
+      style={[
+        styles.editProfileButton,
+        isPressed ? styles.editProfileButtonPressed : {},
+        props.style,
+      ]}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      onPress={props.onPress}
+      activeOpacity={1}>
+      <Text style={styles.editProfileButtonText}>
+        {props.title || "Edit Profile"}
+      </Text>
     </TouchableOpacity>
   );
 };
@@ -61,22 +96,40 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   creativeButton: {
-    backgroundColor: '#ff8c00',
+    backgroundColor: "#ff8c00",
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     elevation: 3,
-    shadowColor: '#ff8c00',
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: "#ff8c00",
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
     shadowRadius: 2,
   },
   creativeButtonText: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+  },
+  editProfileButton: {
+    borderColor: COLORS.black,
+    borderWidth: 2,
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "transparent",
+  },
+  editProfileButtonText: {
+    color: COLORS.black,
+    fontSize: 18,
+  },
+  editProfileButtonPressed: {
+    backgroundColor: COLORS.lightGrey, 
   },
 });
+
 export default Button;
