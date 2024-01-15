@@ -16,6 +16,7 @@ import {LinearGradient} from "expo-linear-gradient";
 import {Image} from "react-native";
 import {Button, OrangeButton} from "../../Constants/Button";
 import {Ionicons} from "@expo/vector-icons";
+import * as SecureStore from "expo-secure-store";
 
 export default function SignUp({navigation}) {
   const [username, setUsername] = useState("");
@@ -23,6 +24,10 @@ export default function SignUp({navigation}) {
   const [isTutor, setIsTutor] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  async function save(key, value) {
+    await SecureStore.setItemAsync(key, value);
+  }
 
   const handleRegistration = async () => {
     // Data to be sent to the backend
@@ -46,6 +51,8 @@ export default function SignUp({navigation}) {
 
       // Check for successful registration
       if (response.ok) {
+        await save("userId", json.userId); // Save the user ID
+
         // Navigate to the Login page
         navigation.navigate("Login");
       } else {

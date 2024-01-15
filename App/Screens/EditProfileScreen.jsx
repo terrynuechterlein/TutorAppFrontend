@@ -17,50 +17,84 @@ import BannerModal from "../../Components/BannerModal";
 
 import {Animated} from "react-native";
 
-const EditProfileScreen = ({navigation}) => {
+const EditProfileScreen = ({navigation, route}) => {
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
   const [school, setSchool] = useState("");
   const [grade, setGrade] = useState("");
-  const [bannerImage, setBannerImage] = useState(null); 
-  const [email, setEmail] = useState("");
+  const [bannerImage, setBannerImage] = useState(null);
+  // const [email, setEmail] = useState("");
   const [profileImage, setProfileImage] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isBannerModalVisible, setIsBannerModalVisible] = useState(false);
+   // New state to track changes
+  const [changedFields, setChangedFields] = useState({});
 
-  const colleges = ["College 1", "College 2", "College 3"]; 
+  const colleges = ["College 1", "College 2", "College 3"];
   const grades = ["Freshman", "Sophomore", "Junior", "Senior", "Other"];
 
+  const {userId} = route.params; // Get userId from navigation parameters
+
+  // Log the received userId and handle if it's null
+  useEffect(() => {
+    console.log("Received userId: ", userId);
+    if (!userId) {
+      console.warn("No userId provided. Navigating back.");
+      navigation.goBack();
+    }
+  }, [userId, navigation]);
+
   const handleSave = async () => {
+    if (!userId) {
+      console.error("Cannot save profile without userId.");
+      return;
+    }
     const userInfo = {
-        name,
-        email,
-        bio,
-        website,
-        school,
-        grade,
+      name,
+      // email,
+      bio,
+      website,
+      school,
+      grade,
     };
 
-    try {
-        const response = await fetch(`http://10.2.1.246:5016/api/tutors/${userId}/updateProfile`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(userInfo),
-        });
+    console.log("UserID for update: ", userId);
+    console.log("UserInfo: ", userInfo);
 
-        const data = await response.json();
-        if (response.ok) {
-            console.log("Profile updated:", data);
-        } else {
-            console.error("Error updating profile:", data);
+    try {
+      // First, update the user information
+      const response = await fetch(
+        `http://10.2.1.246:5016/api/tutors/${userId}/updateProfile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userInfo),
         }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("Profile updated:", data);
+
+        // If the profile update is successful and there's a new profile image, upload it
+        if (profileImage && profileImage.uri) {
+          await uploadProfileImage(profileImage.uri, userId);
+        }
+        // Upload banner image if present
+        if (bannerImage && bannerImage.uri) {
+          await uploadBannerImage(bannerImage.uri, userId);
+        }
+      } else {
+        console.error("Error updating profile:", data);
+      }
     } catch (error) {
-        console.error("Network error:", error);
+      console.error("Network error:", error);
     }
-};
+  };
 
   const goBack = () => {
     navigation.goBack(); //function to go back to the previous screen
@@ -83,14 +117,83 @@ const EditProfileScreen = ({navigation}) => {
 
   const handleBannerImageTaken = (uri) => {
     setBannerImage({uri}); //sets the new image as the banner picture
-    setIsBannerModalVisible(false); 
+    setIsBannerModalVisible(false);
+  };
+
+  const uploadProfileImage = async (imageUri, userId) => {
+    const formData = new FormData();
+    const uriParts = imageUri.split(".");
+    const fileType = uriParts[uriParts.length - 1];
+
+    formData.append("profileImage", {
+      uri: imageUri,
+      name: `profilepic.${fileType}`, 
+      type: `image/${fileType}`,
+    });
+
+    try {
+      const response = await fetch(
+        `http://10.2.1.246:5016/api/tutors/${userId}/uploadProfilePicture`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const responseData = await response.json();
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+  };
+
+  const uploadBannerImage = async (imageUri) => {
+    if (!userId) {
+      console.error("Cannot upload banner image without userId.");
+      return;
+    }
+
+    const formData = new FormData();
+    const uriParts = imageUri.split(".");
+    const fileType = uriParts[uriParts.length - 1];
+
+    formData.append("bannerImage", {
+      uri: imageUri,
+      name: `banner.${fileType}`, 
+      type: `image/${fileType}`,
+    });
+
+    try {
+      const response = await fetch(
+        `http://10.2.1.246:5016/api/tutors/${userId}/uploadBannerImage`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to upload banner image");
+      }
+
+      const responseData = await response.json();
+    } catch (error) {
+      console.error("Error uploading banner image:", error);
+    }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
-        {/* Banner Container */}
-        {/* Header */}
         <View style={styles.headerContainer}>
           <TouchableOpacity onPress={goBack} style={styles.headerIcon}>
             <Ionicons name="arrow-back" size={24} color="white" />
@@ -134,12 +237,12 @@ const EditProfileScreen = ({navigation}) => {
             onChangeText={setName}
             style={styles.input}
           />
-          <TextInput
+          {/* <TextInput
             placeholder="email"
             value={email}
             onChangeText={setEmail}
             style={styles.input}
-          />
+          /> */}
           <Text style={styles.characterLimit}>max 250 characters</Text>
           <TextInput
             placeholder="Bio"
@@ -210,19 +313,18 @@ const styles = StyleSheet.create({
   iconButton: {
     position: "absolute",
     left: 10,
-    bottom: 10, // Move it to the bottom
-    // Include other styling as necessary (e.g., backgroundColor, padding, etc.)
+    bottom: 10, 
   },
   bannerCameraIcon: {
     position: "absolute",
     left: "2%",
     bottom: "93%",
     marginRight: -12,
-    marginBottom: -12, 
+    marginBottom: -12,
   },
   profileImageContainer: {
-    alignItems: "center", 
-    marginTop: -50, 
+    alignItems: "center",
+    marginTop: -50,
   },
   profileImage: {
     width: 100,
@@ -231,43 +333,43 @@ const styles = StyleSheet.create({
   },
   cameraIcon: {
     position: "absolute",
-    right: "50%", 
-    bottom: "50%", 
-    marginRight: -12, 
-    marginBottom: -12, 
+    right: "50%",
+    bottom: "50%",
+    marginRight: -12,
+    marginBottom: -12,
   },
   inputFieldsContainer: {
-    marginTop: 20, 
+    marginTop: 20,
   },
   inputContainer: {
     marginTop: 65,
-    paddingHorizontal: 20, 
+    paddingHorizontal: 20,
   },
   personalInfoTitle: {
     fontWeight: "bold",
     fontSize: 20,
     color: "#000",
-    marginBottom: 10, 
+    marginBottom: 10,
   },
   input: {
-    width: "100%", 
-    backgroundColor: "#F9F9F9", 
-    borderColor: "#CCCCCC", 
-    borderWidth: 0.25, 
-    marginVertical: 10, 
+    width: "100%",
+    backgroundColor: "#F9F9F9",
+    borderColor: "#CCCCCC",
+    borderWidth: 0.25,
+    marginVertical: 10,
     borderRadius: 10,
-    padding: 15, 
-    fontSize: 16, 
+    padding: 15,
+    fontSize: 16,
   },
   bioInput: {
-    height: 100, 
+    height: 100,
     textAlignVertical: "top",
-    paddingVertical: 15, 
+    paddingVertical: 15,
   },
   characterLimit: {
     alignSelf: "flex-start",
     marginLeft: "10%",
-    color: "#FF69B4", 
+    color: "#FF69B4",
     fontSize: 12,
   },
 
@@ -275,17 +377,17 @@ const styles = StyleSheet.create({
     marginLeft: "10%",
     marginTop: 10,
     fontSize: 16,
-    color: "#000", 
+    color: "#000",
   },
   pickerContainer: {
     overflow: "hidden",
     marginBottom: 20,
     marginTop: 35,
-    paddingHorizontal: 20, 
+    paddingHorizontal: 20,
   },
   picker: {
     width: "100%",
-    color: "#000", 
+    color: "#000",
   },
   becomeTutorContainer: {
     flexDirection: "row",
@@ -295,16 +397,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   becomeTutorText: {
-    marginRight: 10, 
+    marginRight: 10,
     fontSize: 16,
     fontWeight: "bold",
-    color: "#000", 
+    color: "#000",
   },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#1DA1F2", 
+    backgroundColor: "#1DA1F2",
     paddingHorizontal: 10,
     paddingVertical: 15,
   },

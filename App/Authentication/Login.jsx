@@ -13,6 +13,8 @@ import COLORS from "../../Constants/colors";
 import {Button, OrangeButton} from "../../Constants/Button";
 import {Ionicons} from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
+import { useDispatch } from 'react-redux';
+import { login } from '../Actions/AuthActions';
 
 export default function Login({navigation}) {
   const [email, setEmail] = useState("");
@@ -22,6 +24,8 @@ export default function Login({navigation}) {
     await SecureStore.setItemAsync(key, value);
   }
 
+  const dispatch = useDispatch();
+  
   const handleLogin = async () => {
     const userData = {
       email,
@@ -37,15 +41,10 @@ export default function Login({navigation}) {
         body: JSON.stringify(userData),
       });
 
-      // Check for successful login
       if (response.ok) {
         const json = await response.json(); 
-        await save("userToken", json.token); // Save the token
-
-        // Navigate to the Dashboard
-        navigation.navigate("AppTabs");
+        dispatch(login(json.token, json.userId));
       } else {
-        // If the response is not ok, log the entire response for debugging
         const responseBody = await response.text();
         console.error("Error during login:", responseBody);
       }

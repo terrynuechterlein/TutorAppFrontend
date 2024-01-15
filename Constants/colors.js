@@ -9,6 +9,7 @@ const COLORS = {
   logoYellow: '#F8CF27',
   orange: '#ff8c00',
   yellow: "#ffd700",
+  lightgrey: "#E5E5E5",
 }
 
 export default COLORS;

@@ -5,7 +5,6 @@ import { showMessage } from "react-native-flash-message";
 import Modal from 'react-native-modal';
 import * as ImagePicker from 'expo-image-picker';
 
-
 export default function ProfileModal({ isVisible, onClose, onImageTaken }) {
 
   const handleChooseFromLibrary = async () => {
@@ -29,13 +28,13 @@ export default function ProfileModal({ isVisible, onClose, onImageTaken }) {
     });
     
     // If the user doesn't cancel the operation, send the chosen image back
-    if (!result.cancelled) {
-      onClose(); // Close the modal
-      onImageTaken(result.uri); // Send the selected image back to the profile screen
-    }
+    if (!result.canceled) {
+      const imageUri = result.assets[0].uri; // Accessing the uri from the assets array
+      onClose();
+      onImageTaken(imageUri);
+   }
   };
   
-
   const handleTakePhoto = async () => {
     // Ask for permission to access the camera
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
