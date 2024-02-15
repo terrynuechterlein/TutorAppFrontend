@@ -15,20 +15,20 @@ import Button, {
   CreativeButton,
   EditProfileButton,
 } from "../../Constants/Button";
-import DoodlePaper from "../../Components/DoodlePaper";
 import ProfileStats from "../../Components/ProfileStats";
-import ProfileModal from "../../Components/ProfileModal";
 import FlashMessage from "react-native-flash-message";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
 
 import {faSchool} from "@fortawesome/free-solid-svg-icons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import * as SecureStore from "expo-secure-store"; // Import SecureStore
 import {useSelector} from "react-redux";
-import AntDesign from 'react-native-vector-icons/AntDesign';
-
+import AntDesign from "react-native-vector-icons/AntDesign";
+import IconRow from "../../Components/IconRow";
+import ProfileCategories from "../../Components/ProfileCategories";
+import AboutComponent from "../../Components/AboutComponent";
 
 export default function Profile({navigation}) {
   const [bio, setBio] = useState("");
@@ -123,7 +123,7 @@ export default function Profile({navigation}) {
 
   return (
     <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.bannerContainer}>
+      <View style={styles.bannerContainer}>
         <TouchableOpacity
           onPress={handleSettingsPress}
           style={[styles.iconWrapper, styles.gearIconWrapper]}>
@@ -133,9 +133,12 @@ export default function Profile({navigation}) {
           source={bannerImage || require("../../assets/Study.png")}
           style={styles.banner}
         />
-      </TouchableOpacity>
+        <View style={styles.iconRow}>
+          <IconRow />
+        </View>
+      </View>
 
-      <View style={styles.profileAndStatsContainer}>
+      <View style={styles.profileDetailsContainer}>
         <View style={styles.profileContainer}>
           {/* Profile image and name */}
           <TouchableOpacity>
@@ -158,19 +161,40 @@ export default function Profile({navigation}) {
 
           {/* Degree info */}
           <View style={styles.infoRow}>
-            <MaterialCommunityIcons name="book-education" size={15} color="black" />
+            <MaterialCommunityIcons
+              name="book-education"
+              size={15}
+              color="black"
+            />
             <Text style={styles.infoText}>Degree</Text>
           </View>
 
           {/* Degree info */}
           <View style={styles.infoRow}>
-          <AntDesign name="link"size={15} color="black" />
+            <AntDesign name="link" size={15} color="black" />
             <Text style={styles.infoText}>Website</Text>
           </View>
         </View>
 
+        <View style={styles.profileStatsContainer}>
+        <View>
+          <ProfileStats posts={0} followers={0} following={0} />
+        </View>
+
         <EditProfileButton onPress={navigateToEditProfile} />
+        </View>
       </View>
+
+      <View style={styles.AboutContainer}>
+        <AboutComponent/>
+      </View>
+
+      <View style={styles.menuContainer}>
+        <ProfileCategories/>
+      </View>
+
+      {/* Horizontal Line */}
+      <View style={styles.horizontalLine}/>
     </ScrollView>
   );
 }
@@ -221,8 +245,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 3,
     marginLeft: -10,
   },
@@ -252,10 +276,12 @@ const styles = StyleSheet.create({
   button: {
     width: 75,
   },
-  profileAndStatsContainer: {
+  profileDetailsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    // backgroundColor: 'orange',
+
   },
   gearIcon: {
     position: "absolute",
@@ -273,4 +299,24 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.3)",
     padding: 8,
   },
+  iconRow: {
+    top: -35,
+  },
+  profileStatsContainer:{
+    top: -25,
+    gap: 15,
+    right: 5,
+  },
+  menuContainer: {
+    // backgroundColor: 'green',
+    marginTop: 13,
+  },
+  horizontalLine: {
+    height: 1, 
+    backgroundColor: 'black', 
+    width: '100%', 
+  },
+  AboutContainer: {
+    marginTop: 30,
+  }
 });
