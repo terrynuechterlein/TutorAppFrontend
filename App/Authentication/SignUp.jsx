@@ -19,7 +19,7 @@ import {Ionicons} from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
 
 export default function SignUp({navigation}) {
-  const [username, setUsername] = useState("");
+  const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [isTutor, setIsTutor] = useState(false);
   const [password, setPassword] = useState("");
@@ -32,7 +32,7 @@ export default function SignUp({navigation}) {
   const handleRegistration = async () => {
     // Data to be sent to the backend
     const userData = {
-      username,
+      userName,
       email,
       isTutor,
       password,
@@ -115,8 +115,8 @@ export default function SignUp({navigation}) {
                   style={{flex: 1, marginLeft: 10, color: COLORS.white}}
                   placeholder="Username"
                   placeholderTextColor={COLORS.white}
-                  onChangeText={(text) => setUsername(text)}
-                  value={username}
+                  onChangeText={(text) => setUserName(text)}
+                  value={userName}
                 />
               </View>
               <View

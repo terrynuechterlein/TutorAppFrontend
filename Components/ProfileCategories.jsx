@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   activeUnderline: {
-    backgroundColor: "#00ffff",
+    backgroundColor: "#ff8c00",
   },
   inactiveUnderline: {
     backgroundColor: "transparent",

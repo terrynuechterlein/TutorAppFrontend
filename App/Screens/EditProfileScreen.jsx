@@ -7,43 +7,114 @@ import {
   StyleSheet,
   ScrollView,
   Text,
-  SafeAreaView, // Import SafeAreaView
+  SafeAreaView, 
 } from "react-native";
 import {Picker} from "@react-native-picker/picker";
+import {useSelector} from "react-redux";
 import ProfileModal from "../../Components/ProfileModal";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import COLORS from "../../Constants/colors";
 import BannerModal from "../../Components/BannerModal";
+import { faDiscord } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { fetchUserDetails } from "../../Utilities/fetchUserDetails";
+
 
 import {Animated} from "react-native";
 
 const EditProfileScreen = ({navigation, route}) => {
-  const [name, setName] = useState("");
-  const [bio, setBio] = useState("");
+  const [userName, setUserName] = useState("");
   const [website, setWebsite] = useState("");
   const [school, setSchool] = useState("");
   const [grade, setGrade] = useState("");
   const [bannerImage, setBannerImage] = useState(null);
-  // const [email, setEmail] = useState("");
+  const [major, setMajor] = useState("");
   const [profileImage, setProfileImage] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isBannerModalVisible, setIsBannerModalVisible] = useState(false);
-   // New state to track changes
-  const [changedFields, setChangedFields] = useState({});
+  const [youtubeURL, setYoutubeURL] = useState("");
+  const [twitchURL, setTwitchURL] = useState("");
+  const [discordURL, setDiscordURL] = useState("");
+  const [linkedinURL, setLinkedinURL] = useState("");
+  const [changedFields, setChangedFields] = useState("");
 
-  const colleges = ["College 1", "College 2", "College 3"];
   const grades = ["Freshman", "Sophomore", "Junior", "Senior", "Other"];
 
-  const {userId} = route.params; // Get userId from navigation parameters
+  const userId = useSelector((state) => state.auth.userId);
 
-  // Log the received userId and handle if it's null
   useEffect(() => {
-    console.log("Received userId: ", userId);
+    fetchProfileImage();
+    fetchBannerImage();
+  }, [userId]);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const userProfile = await fetchUserDetails(userId); 
+      if(userProfile) {
+        setUserName(userProfile.userName || '');
+        setWebsite(userProfile.website || '');
+        setSchool(userProfile.school || '');
+        setGrade(userProfile.grade || '');
+        setMajor(userProfile.major || '');
+      }
+    };
+    fetchUserProfile();
+  }, [userId]);
+
+  const fetchProfileImage = async () => {
     if (!userId) {
-      console.warn("No userId provided. Navigating back.");
-      navigation.goBack();
+      console.error("No userId available for fetching profile image");
+      return;
     }
-  }, [userId, navigation]);
+
+    try {
+      const response = await fetch(
+        `http://10.2.1.246:5016/api/tutors/${userId}/profileImage`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Profile Image URL:", data.imageUrl); 
+        if (data.imageUrl) {
+          setProfileImage({uri: data.imageUrl});
+        } else {
+          setProfileImage(require("../../assets/penguin.png")); 
+        }
+      } else {
+        console.error("Failed to fetch profile image");
+        setProfileImage(require("../../assets/penguin.png")); 
+      }
+    } catch (error) {
+      console.error("Error fetching profile image:", error);
+      setProfileImage(require("../../assets/penguin.png")); 
+    }
+  };
+
+  const fetchBannerImage = async () => {
+    if (!userId) {
+      console.error("No userId available for fetching banner image");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://10.2.1.246:5016/api/tutors/${userId}/bannerImage`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        if (data.imageUrl) {
+          setBannerImage({uri: data.imageUrl});
+        } else {
+          setBannerImage(require("../../assets/Study.png")); 
+        }
+      } else {
+        console.error("Failed to fetch banner image");
+        setBannerImage(require("../../assets/Study.png"));
+      }
+    } catch (error) {
+      console.error("Error fetching banner image:", error);
+      setBannerImage(require("../../assets/Study.png"));
+    }
+  };
 
   const handleSave = async () => {
     if (!userId) {
@@ -51,19 +122,17 @@ const EditProfileScreen = ({navigation, route}) => {
       return;
     }
     const userInfo = {
-      name,
-      // email,
-      bio,
+      userName,
       website,
       school,
       grade,
+      major,
     };
 
     console.log("UserID for update: ", userId);
     console.log("UserInfo: ", userInfo);
 
     try {
-      // First, update the user information
       const response = await fetch(
         `http://10.2.1.246:5016/api/tutors/${userId}/updateProfile`,
         {
@@ -80,11 +149,9 @@ const EditProfileScreen = ({navigation, route}) => {
       if (response.ok) {
         console.log("Profile updated:", data);
 
-        // If the profile update is successful and there's a new profile image, upload it
         if (profileImage && profileImage.uri) {
           await uploadProfileImage(profileImage.uri, userId);
         }
-        // Upload banner image if present
         if (bannerImage && bannerImage.uri) {
           await uploadBannerImage(bannerImage.uri, userId);
         }
@@ -97,7 +164,7 @@ const EditProfileScreen = ({navigation, route}) => {
   };
 
   const goBack = () => {
-    navigation.goBack(); //function to go back to the previous screen
+    navigation.goBack(); 
   };
 
   const fadeIn = new Animated.Value(0);
@@ -111,12 +178,12 @@ const EditProfileScreen = ({navigation, route}) => {
   }, []);
 
   const handleImageTaken = (uri) => {
-    setProfileImage({uri}); // sets the new image as the profile picture
-    setIsModalVisible(false); // Close the modal after selecting an image
+    setProfileImage({uri}); 
+    setIsModalVisible(false); 
   };
 
   const handleBannerImageTaken = (uri) => {
-    setBannerImage({uri}); //sets the new image as the banner picture
+    setBannerImage({uri}); 
     setIsBannerModalVisible(false);
   };
 
@@ -127,7 +194,7 @@ const EditProfileScreen = ({navigation, route}) => {
 
     formData.append("profileImage", {
       uri: imageUri,
-      name: `profilepic.${fileType}`, 
+      name: `profilepic.${fileType}`,
       type: `image/${fileType}`,
     });
 
@@ -165,7 +232,7 @@ const EditProfileScreen = ({navigation, route}) => {
 
     formData.append("bannerImage", {
       uri: imageUri,
-      name: `banner.${fileType}`, 
+      name: `banner.${fileType}`,
       type: `image/${fileType}`,
     });
 
@@ -203,6 +270,7 @@ const EditProfileScreen = ({navigation, route}) => {
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
         </View>
+
         <View style={styles.bannerContainer}>
           <Image
             source={bannerImage || require("../../assets/Study.png")}
@@ -215,7 +283,6 @@ const EditProfileScreen = ({navigation, route}) => {
           </TouchableOpacity>
         </View>
 
-        {/* Profile Image Container */}
         <View style={styles.profileImageContainer}>
           <Image
             source={profileImage || require("../../assets/penguin.png")}
@@ -228,44 +295,105 @@ const EditProfileScreen = ({navigation, route}) => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.inputContainer}>
+        <View style={styles.sectionContainer}>
           <Text style={styles.personalInfoTitle}>Personal Information</Text>
 
-          <TextInput
-            placeholder="Name"
-            value={name}
-            onChangeText={setName}
-            style={styles.input}
-          />
-          {/* <TextInput
-            placeholder="email"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-          /> */}
-          <Text style={styles.characterLimit}>max 250 characters</Text>
-          <TextInput
-            placeholder="Bio"
-            value={bio}
-            onChangeText={setBio}
-            maxLength={250}
-            style={[styles.input, styles.bioInput]}
-          />
-          <TextInput
-            placeholder="Website"
-            value={website}
-            onChangeText={setWebsite}
-            style={styles.input}
-          />
-          <TextInput
-            placeholder="College"
-            value={school}
-            onChangeText={setSchool}
-            style={styles.input}
-          />
+          <View style={styles.inputGroup}>
+            <View style={styles.nameContainer}>
+              <Text style={styles.nameTitle}>Name</Text>
+              <TextInput
+                placeholder="Name"
+                value={userName}
+                onChangeText={setUserName}
+                style={styles.input}
+              />
+            </View>
+            <View style={styles.websiteContainer}>
+              <Text style={styles.websiteTitle}>Website</Text>
+              <TextInput
+                placeholder="Website"
+                value={website}
+                onChangeText={setWebsite}
+                style={styles.input}
+              />
+            </View>
+            <View style={styles.collegeContainer}>
+              <Text style={styles.collegeTitle}>College</Text>
+              <TextInput
+                placeholder="College"
+                value={school}
+                onChangeText={setSchool}
+                style={styles.input}
+              />
+            </View>
+            <View style={styles.majorContainer}>
+              <Text style={styles.majorTitle}>Major</Text>
+              <TextInput
+                placeholder="Major"
+                value={major}
+                onChangeText={setMajor}
+                style={styles.input}
+              />
+            </View>
+          </View>
         </View>
 
-        <View style={styles.pickerContainer}>
+        {/* Social Media section */}
+        <View style={styles.sectionContainer}>
+          <Text style={styles.personalInfoTitle}>Social Media</Text>
+          <View style={styles.inputGroup}>
+          <View style={styles.inputContainer}>
+            <View style={styles.inputTitle}>
+            <Ionicons name="logo-youtube" size={12} color={'red'}></Ionicons>
+            <Text style={styles.nameTitle}>Youtube URL</Text>
+            </View>
+            <TextInput
+              placeholder="Youtube"
+              value={youtubeURL}
+              onChangeText={setYoutubeURL}
+              style={styles.input}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <View style={styles.inputTitle}>
+            <Ionicons name="logo-twitch" size={12} color={'#6b4ba1'}></Ionicons>
+            <Text style={styles.nameTitle}>Twitch URL</Text>
+            </View>
+            <TextInput
+              placeholder="Twitch"
+              value={twitchURL}
+              onChangeText={setTwitchURL}
+              style={styles.input}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <View style={styles.inputTitle}>
+            <FontAwesomeIcon icon={faDiscord} size={12} color="#7289da" />
+            <Text style={styles.nameTitle}>Discord URL</Text>
+            </View>
+            <TextInput
+              placeholder="Discord"
+              value={discordURL}
+              onChangeText={setDiscordURL}
+              style={styles.input}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <View style={styles.inputTitle}>
+            <Ionicons name="logo-linkedin" size={12} color={'#0077B5'}></Ionicons>
+            <Text style={styles.nameTitle}>LinkedIn URL</Text>
+            </View>
+            <TextInput
+              placeholder="LinkedIn"
+              value={linkedinURL}
+              onChangeText={setLinkedinURL}
+              style={styles.input}
+            />
+          </View>
+        </View>
+        </View>
+
+        <View style={styles.sectionContainer}>
           <Text style={styles.personalInfoTitle}>Year</Text>
           <Picker
             selectedValue={grade}
@@ -304,7 +432,6 @@ const styles = StyleSheet.create({
   },
   bannerContainer: {
     height: 200,
-    backgroundColor: "turquoise",
   },
   banner: {
     width: "100%",
@@ -313,7 +440,7 @@ const styles = StyleSheet.create({
   iconButton: {
     position: "absolute",
     left: 10,
-    bottom: 10, 
+    bottom: 10,
   },
   bannerCameraIcon: {
     position: "absolute",
@@ -325,11 +452,15 @@ const styles = StyleSheet.create({
   profileImageContainer: {
     alignItems: "center",
     marginTop: -50,
+    marginBottom: 70,
+    overflow: "hidden",
+
   },
   profileImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
+    aspectRatio: 1,
   },
   cameraIcon: {
     position: "absolute",
@@ -341,9 +472,13 @@ const styles = StyleSheet.create({
   inputFieldsContainer: {
     marginTop: 20,
   },
-  inputContainer: {
-    marginTop: 65,
+  sectionContainer: {
+    top: 10,
     paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  inputGroup: {
+    paddingTop: 10,
   },
   personalInfoTitle: {
     fontWeight: "bold",
@@ -361,10 +496,9 @@ const styles = StyleSheet.create({
     padding: 15,
     fontSize: 16,
   },
-  bioInput: {
-    height: 100,
-    textAlignVertical: "top",
-    paddingVertical: 15,
+  inputTitle: {
+    flexDirection: 'row',
+    gap: 5,
   },
   characterLimit: {
     alignSelf: "flex-start",
@@ -382,7 +516,6 @@ const styles = StyleSheet.create({
   pickerContainer: {
     overflow: "hidden",
     marginBottom: 20,
-    marginTop: 35,
     paddingHorizontal: 20,
   },
   picker: {
@@ -427,7 +560,7 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff", // Match the background color of the header
+    backgroundColor: "#fff", 
   },
 });
 export default EditProfileScreen;

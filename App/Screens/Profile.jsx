@@ -43,7 +43,39 @@ export default function Profile({navigation}) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   // const [userId, setUserId] = useState(null);
 
+  const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
+  const [school, setSchool] = useState('');
+  const [major, setMajor] = useState('');
   const userId = useSelector((state) => state.auth.userId);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!userId) {
+        console.error("No userId available for fetching profile details");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `http://10.2.1.246:5016/api/tutors/${userId}/profile`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setFullName(`${data.firstName} ${data.lastName}`);
+          setUsername(data.userName);
+          setSchool(data.school);
+          setMajor(data.major);
+        } else {
+          console.error("Failed to fetch user profile details");
+        }
+      } catch (error) {
+        console.error("Error fetching user profile details:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, [userId]);
 
   useEffect(() => {
     fetchProfileImage();
@@ -140,7 +172,6 @@ export default function Profile({navigation}) {
 
       <View style={styles.profileDetailsContainer}>
         <View style={styles.profileContainer}>
-          {/* Profile image and name */}
           <TouchableOpacity>
             <View style={styles.profileImageContainer}>
               <Image
@@ -150,26 +181,23 @@ export default function Profile({navigation}) {
               />
             </View>
           </TouchableOpacity>
-          <Text style={styles.fullName}>FullName</Text>
-          <Text style={styles.userName}>@username</Text>
+          <Text style={styles.fullName}>{fullName}</Text>
+          <Text style={styles.userName}>@{username}</Text>
 
-          {/* School info */}
           <View style={styles.infoRow}>
             <FontAwesomeIcon icon={faSchool} size={15} color="black" />
-            <Text style={styles.infoText}>School</Text>
+            <Text style={styles.infoText}>{school}</Text>
           </View>
 
-          {/* Degree info */}
           <View style={styles.infoRow}>
             <MaterialCommunityIcons
               name="book-education"
               size={15}
               color="black"
             />
-            <Text style={styles.infoText}>Degree</Text>
+            <Text style={styles.infoText}>{major}</Text>
           </View>
 
-          {/* Degree info */}
           <View style={styles.infoRow}>
             <AntDesign name="link" size={15} color="black" />
             <Text style={styles.infoText}>Website</Text>
@@ -202,7 +230,6 @@ export default function Profile({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: "#4B0082",
   },
   bannerContainer: {
     width: "100%",
@@ -213,7 +240,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   profileContainer: {
-    alignItems: "center",
+    alignItems: "flex-start",
     marginTop: -50,
     marginLeft: 10,
   },
@@ -223,7 +250,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     overflow: "hidden",
     borderWidth: 3,
-    borderColor: "#00ffff",
+    borderColor: "rgba(0, 120, 255, 1)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -233,22 +260,19 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
   },
   fullName: {
-    // color: "#ffffff",
     fontSize: 20,
     fontWeight: "bold",
     marginTop: 10,
   },
   userName: {
-    // color: "#ffffff",
     fontSize: 15,
     marginTop: 5,
     marginBottom: 5,
   },
   infoRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     marginTop: 3,
-    marginLeft: -10,
   },
   infoText: {
     marginLeft: 8,
@@ -280,8 +304,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    // backgroundColor: 'orange',
-
   },
   gearIcon: {
     position: "absolute",
@@ -308,7 +330,6 @@ const styles = StyleSheet.create({
     right: 5,
   },
   menuContainer: {
-    // backgroundColor: 'green',
     marginTop: 13,
   },
   horizontalLine: {

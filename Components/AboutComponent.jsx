@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     minHeight: 130,
+
   },
   summaryText: {
     fontSize: 16,

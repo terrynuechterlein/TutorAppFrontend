@@ -48,6 +48,15 @@ export default function AppTabs({navigation}) {
 
             return <Ionicons name={iconName} size={size} color={color} />;
           },
+          tabBarActiveTintColor: '#ff8c00', 
+          tabBarInactiveTintColor: '#ffffff', 
+          tabBarStyle: {
+            backgroundColor: 'rgba(0, 120, 255, 1)',
+          },
+          headerStyle: {
+            backgroundColor: 'rgba(0, 120, 255, 1)', 
+          },
+          headerTintColor: '#ffffff', 
         })}>
         <Tab.Screen name={discoverName} component={Discover} />
         <Tab.Screen name={dashboardName} component={Dashboard} />
