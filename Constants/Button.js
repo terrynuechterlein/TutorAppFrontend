@@ -68,6 +68,7 @@ export const EditProfileButton = (props) => {
   const handlePressOut = () => {
     setIsPressed(false);
   };
+  
 
   return (
     <TouchableOpacity
@@ -83,6 +84,16 @@ export const EditProfileButton = (props) => {
       <Text style={styles.editProfileButtonText}>
         {props.title || "Edit Profile"}
       </Text>
+    </TouchableOpacity>
+  );
+};
+
+export const BlueButton = (props) => {
+  return (
+    <TouchableOpacity
+      style={[styles.blueButton, props.style]}
+      onPress={props.onPress}>
+      <Text style={styles.blueButtonText}>{props.title}</Text>
     </TouchableOpacity>
   );
 };
@@ -129,6 +140,18 @@ const styles = StyleSheet.create({
   },
   editProfileButtonPressed: {
     backgroundColor: COLORS.lightGrey, 
+  },
+  blueButton: {
+    backgroundColor: COLORS.appblue, 
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  blueButtonText: {
+    color: COLORS.white, 
+    fontSize: 15,
   },
 });
 

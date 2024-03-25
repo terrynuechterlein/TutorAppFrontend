@@ -5,6 +5,7 @@ import AuthStack from "./AuthStack";
 import AppTabs from "./AppTabs";
 import EditProfile from "../Screens/EditProfileScreen";
 import SettingsScreen from "../Screens/SettingsScreen";
+import UserProfile from "../Screens/UserProfile";
 
 import * as SecureStore from "expo-secure-store";
 
@@ -20,6 +21,8 @@ function MainNavigator() {
           <Stack.Screen name="App" component={AppTabs} />
           <Stack.Screen name="EditProfile" component={EditProfile} />
           <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
+          <Stack.Screen name="UserProfile" component={UserProfile} />
+
         </>
       ) : (
         <Stack.Screen name="Auth" component={AuthStack} />

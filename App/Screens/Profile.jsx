@@ -9,17 +9,19 @@ import {
   TouchableOpacity,
   ScrollView,
   Keyboard,
+  Linking,
 } from "react-native";
 import Button, {
   OrangeButton,
   CreativeButton,
   EditProfileButton,
+  BlueButton,
 } from "../../Constants/Button";
 import ProfileStats from "../../Components/ProfileStats";
 import FlashMessage from "react-native-flash-message";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
-
+import {useFocusEffect} from "@react-navigation/native";
 import {faSchool} from "@fortawesome/free-solid-svg-icons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
@@ -29,53 +31,70 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import IconRow from "../../Components/IconRow";
 import ProfileCategories from "../../Components/ProfileCategories";
 import AboutComponent from "../../Components/AboutComponent";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 export default function Profile({navigation}) {
   const [bio, setBio] = useState("");
-  const [savedBio, setSavedBio] = useState("");
   const [profileImage, setProfileImage] = useState(null);
   const [bannerImage, setBannerImage] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [showDoodlePaper, setShowDoodlePaper] = useState(false);
   const [postsCount, setPostsCount] = useState(0);
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  // const [userId, setUserId] = useState(null);
+  const [website, setWebsite] = useState("");
+  const [youtubeURL, setYoutubeURL] = useState("");
+  const [twitchURL, setTwitchURL] = useState("");
+  const [discordURL, setDiscordURL] = useState("");
+  const [linkedInURL, setLinkedInURL] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
+  const [school, setSchool] = useState("");
+  const [major, setMajor] = useState("");
 
-  const [fullName, setFullName] = useState('');
-  const [username, setUsername] = useState('');
-  const [school, setSchool] = useState('');
-  const [major, setMajor] = useState('');
   const userId = useSelector((state) => state.auth.userId);
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!userId) {
-        console.error("No userId available for fetching profile details");
-        return;
-      }
-
-      try {
-        const response = await fetch(
-          `http://10.2.1.246:5016/api/tutors/${userId}/profile`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setFullName(`${data.firstName} ${data.lastName}`);
-          setUsername(data.userName);
-          setSchool(data.school);
-          setMajor(data.major);
-        } else {
-          console.error("Failed to fetch user profile details");
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchUserProfile = async () => {
+        if (!userId) {
+          console.error("No userId available for fetching profile details");
+          return;
         }
-      } catch (error) {
-        console.error("Error fetching user profile details:", error);
-      }
-    };
 
-    fetchUserProfile();
-  }, [userId]);
+        try {
+          const response = await fetch(
+            `http://10.2.1.246:5016/api/tutors/${userId}/profile`
+          );
+          if (response.ok) {
+            const data = await response.json();
+            console.log("data info:", data);
+            console.log("Fetched bio:", data.bio);
+            console.log("fetched youtubeURL!: ", data.youtubeUrl);
+            setFullName(`${data.firstName} ${data.lastName}`);
+            setUsername(data.userName);
+            setSchool(data.school);
+            setMajor(data.major);
+            setBio(data.bio);
+            setWebsite(data.website);
+            setYoutubeURL(data.youtubeUrl);
+            setTwitchURL(data.twitchUrl);
+            setDiscordURL(data.discordUrl);
+            setLinkedInURL(data.linkedInUrl);
+            console.log("State bio:", bio);
+            console.log("State school:", school);
+            console.log("State YoutubeURL:", youtubeURL);
+          } else {
+            console.error("Failed to fetch user profile details");
+          }
+        } catch (error) {
+          console.error("Error fetching user profile details:", error);
+        }
+      };
+
+      fetchUserProfile();
+    }, [userId])
+  );
 
   useEffect(() => {
     fetchProfileImage();
@@ -94,7 +113,6 @@ export default function Profile({navigation}) {
       );
       if (response.ok) {
         const data = await response.json();
-        console.log("Profile Image URL:", data.imageUrl); // Log the URL for debugging
         if (data.imageUrl) {
           setProfileImage({uri: data.imageUrl});
         } else {
@@ -102,11 +120,11 @@ export default function Profile({navigation}) {
         }
       } else {
         console.error("Failed to fetch profile image");
-        setProfileImage(require("../../assets/penguin.png")); // Default image
+        setProfileImage(require("../../assets/penguin.png")); 
       }
     } catch (error) {
       console.error("Error fetching profile image:", error);
-      setProfileImage(require("../../assets/penguin.png")); // Default image
+      setProfileImage(require("../../assets/penguin.png")); 
     }
   };
 
@@ -139,7 +157,6 @@ export default function Profile({navigation}) {
 
   const handleSettingsPress = () => {
     navigation.navigate("SettingsScreen");
-    console.log("Settings Icon Pressed");
   };
 
   const navigateToEditProfile = () => {
@@ -147,14 +164,18 @@ export default function Profile({navigation}) {
       console.error("No userId available");
       return;
     }
-    navigation.navigate("EditProfile", {userId: userId});
+    navigation.navigate("EditProfile", {
+      userId: userId,
+    });
   };
 
-  console.log("Current profile image state:", profileImage);
-  console.log("Banner Image URL:", bannerImage);
-
   return (
-    <ScrollView style={styles.container}>
+    <KeyboardAwareScrollView
+      style={{flex: 1}}
+      resetScrollToCoords={{x: 0, y: 0}}
+      scrollEnabled={true}
+      extraHeight={200}
+      enableOnAndroid={true}>
       <View style={styles.bannerContainer}>
         <TouchableOpacity
           onPress={handleSettingsPress}
@@ -166,7 +187,12 @@ export default function Profile({navigation}) {
           style={styles.banner}
         />
         <View style={styles.iconRow}>
-          <IconRow />
+          <IconRow
+            youtube={youtubeURL}
+            twitch={twitchURL}
+            discord={discordURL}
+            linkedIn={linkedInURL}
+          />
         </View>
       </View>
 
@@ -198,32 +224,36 @@ export default function Profile({navigation}) {
             <Text style={styles.infoText}>{major}</Text>
           </View>
 
-          <View style={styles.infoRow}>
-            <AntDesign name="link" size={15} color="black" />
-            <Text style={styles.infoText}>Website</Text>
-          </View>
+          {website && (
+            <View style={styles.infoRow}>
+              <AntDesign name="link" size={15} color="black" />
+              <TouchableOpacity onPress={() => Linking.openURL(website)}>
+                <Text style={styles.infoText}>{website}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         <View style={styles.profileStatsContainer}>
-        <View>
-          <ProfileStats posts={0} followers={0} following={0} />
-        </View>
+          <View>
+            <ProfileStats posts={0} followers={0} following={0} />
+          </View>
 
-        <EditProfileButton onPress={navigateToEditProfile} />
+          <EditProfileButton onPress={navigateToEditProfile} />
         </View>
       </View>
 
       <View style={styles.AboutContainer}>
-        <AboutComponent/>
+        <AboutComponent summary={bio} />
       </View>
 
       <View style={styles.menuContainer}>
-        <ProfileCategories/>
+        <ProfileCategories />
       </View>
 
       {/* Horizontal Line */}
-      <View style={styles.horizontalLine}/>
-    </ScrollView>
+      <View style={styles.horizontalLine} />
+    </KeyboardAwareScrollView>
   );
 }
 
@@ -324,7 +354,7 @@ const styles = StyleSheet.create({
   iconRow: {
     top: -35,
   },
-  profileStatsContainer:{
+  profileStatsContainer: {
     top: -25,
     gap: 15,
     right: 5,
@@ -333,11 +363,11 @@ const styles = StyleSheet.create({
     marginTop: 13,
   },
   horizontalLine: {
-    height: 1, 
-    backgroundColor: 'black', 
-    width: '100%', 
+    height: 1,
+    backgroundColor: "black",
+    width: "100%",
   },
   AboutContainer: {
     marginTop: 30,
-  }
+  },
 });

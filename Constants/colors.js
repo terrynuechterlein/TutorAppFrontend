@@ -10,6 +10,7 @@ const COLORS = {
   orange: '#ff8c00',
   yellow: "#ffd700",
   lightgrey: "#E5E5E5",
+  appblue: 'rgba(0, 120, 255, 1)',
 }
 
 export default COLORS;

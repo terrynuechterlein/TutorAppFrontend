@@ -56,6 +56,10 @@ const EditProfileScreen = ({navigation, route}) => {
         setSchool(userProfile.school || '');
         setGrade(userProfile.grade || '');
         setMajor(userProfile.major || '');
+        setYoutubeURL(userProfile.youtubeUrl || '');
+        setTwitchURL(userProfile.twitchUrl || '');
+        setDiscordURL(userProfile.discordUrl || '');
+        setLinkedinURL(userProfile.linkedInUrl || '');
       }
     };
     fetchUserProfile();
@@ -127,6 +131,10 @@ const EditProfileScreen = ({navigation, route}) => {
       school,
       grade,
       major,
+      youtubeURL,
+      twitchURL,
+      discordURL,
+      linkedinURL,
     };
 
     console.log("UserID for update: ", userId);
@@ -148,6 +156,7 @@ const EditProfileScreen = ({navigation, route}) => {
 
       if (response.ok) {
         console.log("Profile updated:", data);
+        alert("Profile updated successfully");
 
         if (profileImage && profileImage.uri) {
           await uploadProfileImage(profileImage.uri, userId);
@@ -155,6 +164,13 @@ const EditProfileScreen = ({navigation, route}) => {
         if (bannerImage && bannerImage.uri) {
           await uploadBannerImage(bannerImage.uri, userId);
         }
+
+        // Invoke the callback function passed through navigation params
+        if (route.params?.onUpdate) {
+          route.params.onUpdate(data); // Pass the updated data back to Profile screen
+        }
+
+        navigation.goBack();
       } else {
         console.error("Error updating profile:", data);
       }
@@ -258,12 +274,14 @@ const EditProfileScreen = ({navigation, route}) => {
     }
   };
 
+  console.log("Discord URL: ", discordURL);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
         <View style={styles.headerContainer}>
           <TouchableOpacity onPress={goBack} style={styles.headerIcon}>
-            <Ionicons name="arrow-back" size={24} color="white" />
+            <Ionicons name="arrow-back" size={24} color={COLORS.orange} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Profile</Text>
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
@@ -539,7 +557,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#1DA1F2",
+    backgroundColor: COLORS.appblue,
     paddingHorizontal: 10,
     paddingVertical: 15,
   },
@@ -549,7 +567,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   saveButton: {
-    backgroundColor: "white",
+    backgroundColor: COLORS.orange,
     paddingHorizontal: 15,
     paddingVertical: 5,
     borderRadius: 20,

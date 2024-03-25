@@ -1,11 +1,18 @@
 import React, {useState, useEffect, useRef} from "react";
-import {View, Image, StyleSheet, Animated} from "react-native";
-import discord from "../assets/icons/discord.png";
-import linkedin from "../assets/icons/linkedin.png";
-import twitch from "../assets/icons/twitch.png";
-import youtube from "../assets/icons/youtube.png";
+import {
+  View,
+  Image,
+  StyleSheet,
+  Animated,
+  Linking,
+  TouchableOpacity,
+} from "react-native";
+import discordImg from "../assets/icons/discord.png";
+import linkedinImg from "../assets/icons/linkedin.png";
+import twitchImg from "../assets/icons/twitch.png";
+import youtubeImg from "../assets/icons/youtube.png";
 
-export default function IconRow({socialmedia}) {
+export default function IconRow({youtube, twitch, discord, linkedIn}) {
   const bounceAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -26,7 +33,7 @@ export default function IconRow({socialmedia}) {
   }, [bounceAnim]);
 
   const bounceInterpolate = bounceAnim.interpolate({
-    inputRange: [0,1],
+    inputRange: [0, 1],
     outputRange: [0, -1],
   });
 
@@ -35,32 +42,53 @@ export default function IconRow({socialmedia}) {
   };
 
   return (
-      <View style={styles.rectangleContaner}>
-        <View style={styles.iconGroup}>
-          <Animated.Image source={youtube} style={[styles.icons, bounceStyle]} />
-          <Animated.Image source={twitch} style={[styles.icons, bounceStyle]} />
-          <Animated.Image source={discord} style={[styles.icons, bounceStyle]} />
-          <Animated.Image source={linkedin} style={[styles.icons, bounceStyle]} />
-        </View>
+    <View style={styles.rectangleContaner}>
+      <View style={styles.iconGroup}>
+        {youtube && (
+          <TouchableOpacity onPress={() => Linking.openURL(youtube)}>
+            <Animated.Image
+              source={youtubeImg}
+              style={[styles.icons, bounceStyle]}
+            />
+          </TouchableOpacity>
+        )}
+        {twitch && (
+          <TouchableOpacity onPress={()=>Linking.openURL(twitch)}>
+          <Animated.Image source={twitchImg} style={[styles.icons, bounceStyle]} />
+          </TouchableOpacity>
+        )}
+        {discord && (
+          <TouchableOpacity onPress={()=>Linking.openURL(discord)}>
+          <Animated.Image
+            source={discordImg}
+            style={[styles.icons, bounceStyle]}
+          />
+          </TouchableOpacity>
+        )}
+        {linkedIn && (
+          <TouchableOpacity onPress={() => Linking.openURL(linkedIn)}>
+            <Animated.Image
+              source={linkedinImg}
+              style={[styles.icons, bounceStyle]}
+            />
+          </TouchableOpacity>
+        )}
       </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  rectangleContaner: {
-
-  },
+  rectangleContaner: {},
   iconGroup: {
-    flexDirection: 'row',
-    // width: ,
+    flexDirection: "row",
     height: 30,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    gap: 15,    
+    justifyContent: "center",
+    alignItems: "flex-start",
+    gap: 15,
   },
   icons: {
     width: 25,
     height: 25,
-  }
-
+  },
 });
