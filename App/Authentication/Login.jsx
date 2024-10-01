@@ -33,7 +33,7 @@ export default function Login({navigation}) {
     };
 
     try {
-      let response = await fetch("http://10.2.1.246:5016/api/tutors/login", {
+      let response = await fetch("http://192.168.137.1:5016/api/tutors/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

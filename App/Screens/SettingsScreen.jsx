@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import COLORS from '../../Constants/colors';
@@ -17,7 +18,7 @@ import SearchBar from '../../Components/SearchBar';
 export default function SettingsScreen({ navigation }) {
 
   const dispatch = useDispatch();
-  
+     
   const handleSignOut = () => {
     Alert.alert(
       'Sign Out',

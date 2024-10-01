@@ -37,7 +37,7 @@ export default function AboutComponent({summary, editable = false}) {
   };
 
   const updateBio = async () => {
-    const url = `http://10.2.1.246:5016/api/tutors/${userId}/updateBio`;
+    const url = `http://192.168.1.54:5016/api/tutors/${userId}/updateBio`;
     console.log(`Updating bio for userId: ${userId} with bioText: ${bioText}`);
 
     try {

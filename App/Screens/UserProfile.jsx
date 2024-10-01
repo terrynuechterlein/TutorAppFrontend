@@ -31,6 +31,7 @@ import IconRow from "../../Components/IconRow";
 import ProfileCategories from "../../Components/ProfileCategories";
 import AboutComponent from "../../Components/AboutComponent";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function UserProfile({route, navigation}) {
   // Extract the passed user data
@@ -49,6 +50,9 @@ export default function UserProfile({route, navigation}) {
       extraHeight={200}
       enableOnAndroid={true}>
       <View style={styles.bannerContainer}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()} >
+          <Ionicons name= "arrow-back" size={28} color="white"/>
+        </TouchableOpacity>
         <Image
           source={getImageSource(
             user.bannerImageUrl,
@@ -110,6 +114,13 @@ export default function UserProfile({route, navigation}) {
           <View>
             <ProfileStats posts={0} followers={0} following={0} />
           </View>
+          <TouchableOpacity style={styles.messageButton} onPress={() => navigation.navigate("Chat", {user: user})}>
+            <MaterialCommunityIcons
+              name="message-reply-text"
+              size={15}
+              color="#FFF"
+              />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -134,6 +145,16 @@ const styles = StyleSheet.create({
   bannerContainer: {
     width: "100%",
     height: 200,
+    position: "relative",
+  },
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 15,
+    zIndex: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    // padding: 5,
+    borderRadius: 5,
   },
   banner: {
     width: "100%",
@@ -198,6 +219,15 @@ const styles = StyleSheet.create({
     top: -25,
     gap: 15,
     right: 5,
+    alignItems:"center",
+  },
+  messageButton: {
+    backgroundColor: "#007AFF",
+    width: 30,
+    height: 30,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
   },
   menuContainer: {
     marginTop: 13,

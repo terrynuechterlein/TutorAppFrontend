@@ -21,11 +21,15 @@ export default function BannerModal({ isVisible, onClose, onBannerImageTaken }) 
       allowsEditing: false, 
     });
     
-    // If the user doesn't cancel the operation, send the chosen image back
-    if (!result.cancelled) {
-      onClose(); // Close the modal
-      onBannerImageTaken(result.uri); // Send the selected image back to the profile screen
-    }
+    console.log("Result from ImagePicker:", result);
+
+  // If the user doesn't cancel the operation, send the chosen image back
+  if (!result.canceled && result.assets && result.assets.length > 0) {
+    const imageUri = result.assets[0].uri; // Accessing the correct URI
+    onClose(); // Close the modal
+    console.log("Banner image URI:", imageUri);
+    onBannerImageTaken(imageUri); // Send the selected image back to the profile screen
+  }
   };
 
   const handleTakePhoto = async () => {

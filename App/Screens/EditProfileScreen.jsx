@@ -73,7 +73,7 @@ const EditProfileScreen = ({navigation, route}) => {
 
     try {
       const response = await fetch(
-        `http://10.2.1.246:5016/api/tutors/${userId}/profileImage`
+        `http://192.168.137.1:5016/api/tutors/${userId}/profileImage`
       );
       if (response.ok) {
         const data = await response.json();
@@ -101,7 +101,7 @@ const EditProfileScreen = ({navigation, route}) => {
 
     try {
       const response = await fetch(
-        `http://10.2.1.246:5016/api/tutors/${userId}/bannerImage`
+        `http://192.168.137.1:5016/api/tutors/${userId}/bannerImage`
       );
       if (response.ok) {
         const data = await response.json();
@@ -142,7 +142,7 @@ const EditProfileScreen = ({navigation, route}) => {
 
     try {
       const response = await fetch(
-        `http://10.2.1.246:5016/api/tutors/${userId}/updateProfile`,
+        `http://192.168.137.1:5016/api/tutors/${userId}/updateProfile`,
         {
           method: "PUT",
           headers: {
@@ -199,6 +199,7 @@ const EditProfileScreen = ({navigation, route}) => {
   };
 
   const handleBannerImageTaken = (uri) => {
+    console.log("Banner image URI passed to EditProfileScreen:", uri);
     setBannerImage({uri}); 
     setIsBannerModalVisible(false);
   };
@@ -216,7 +217,7 @@ const EditProfileScreen = ({navigation, route}) => {
 
     try {
       const response = await fetch(
-        `http://10.2.1.246:5016/api/tutors/${userId}/uploadProfilePicture`,
+        `http://192.168.137.1:5016/api/tutors/${userId}/uploadProfilePicture`,
         {
           method: "POST",
           headers: {
@@ -254,7 +255,7 @@ const EditProfileScreen = ({navigation, route}) => {
 
     try {
       const response = await fetch(
-        `http://10.2.1.246:5016/api/tutors/${userId}/uploadBannerImage`,
+        `http://192.168.137.1:5016/api/tutors/${userId}/uploadBannerImage`,
         {
           method: "POST",
           headers: {

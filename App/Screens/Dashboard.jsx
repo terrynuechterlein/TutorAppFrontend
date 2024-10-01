@@ -25,7 +25,7 @@ export default function Dashboard({navigation}) {
     const fetchUserProfile = async () => {
       try {
         const response = await fetch(
-          `http://10.2.1.246:5016/api/tutors/${userId}/profile`
+          `http://192.168.137.1:5016/api/tutors/${userId}/profile`
         );
         if (response.ok) {
           const data = await response.json();
