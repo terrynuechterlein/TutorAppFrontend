@@ -33,7 +33,7 @@ const AccountSetupModal = ({isVisible, onClose}) => {
       school,
       major,
     };
-    const initialSetupUrl = `http://192.168.137.1:5016/api/tutors/${userId}/initialSetup`; // Adjusted to the new endpoint
+    const initialSetupUrl = `http://192.168.0.48:5016/api/tutors/${userId}/initialSetup`; // Adjusted to the new endpoint
 
     try {
       const response = await fetch(initialSetupUrl, {

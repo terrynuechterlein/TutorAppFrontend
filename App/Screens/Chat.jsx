@@ -28,7 +28,7 @@ const Chat = ({route, navigation}) => {
   const fetchMessages = async () => {
     try {
       const response = await fetch(
-        `http://192.168.137.1:5016/api/messages/conversation/${user.id}`,
+        `http://192.168.0.48:5016/api/messages/conversation/${user.id}`,
         {
           method: "GET",
           headers: {
@@ -64,7 +64,7 @@ const Chat = ({route, navigation}) => {
     if (text) {
       console.log("sendMessage called with text:", text);
       try {
-        const response = await fetch(`http://192.168.137.1:5016/api/messages`, {
+        const response = await fetch(`http://192.168.0.48:5016/api/messages`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,

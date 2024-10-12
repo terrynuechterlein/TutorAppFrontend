@@ -1,7 +1,7 @@
 export const fetchUserDetails = async (userId) => {
   try {
     const response = await fetch(
-      `http://192.168.137.1:5016/api/tutors/${userId}/profile`
+      `http://192.168.0.48:5016/api/tutors/${userId}/profile`
     );
 
     if (!response.ok) {

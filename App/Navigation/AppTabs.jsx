@@ -13,12 +13,12 @@ import COLORS from "../../Constants/colors";
 import hornetlogo2 from "../../assets/hornetLogo2.png";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import Dashboard from "../Screens/Dashboard";
+import Projects from "../Screens/Projects";
 import Message from "../Screens/Message";
 import Profile from "../Screens/Profile";
 import Discover from "../Screens/Discover";
 
-const dashboardName = "Dashboard";
+const projectsName = "Projects";
 const messageName = "Message";
 const discoverName = "Discover";
 const profileName = "Profile";
@@ -28,7 +28,7 @@ const Tab = createBottomTabNavigator();
 export default function AppTabs({navigation}) {
   return (
       <Tab.Navigator
-        initialRouteName={dashboardName}
+        initialRouteName={projectsName}
         screenOptions={({route}) => ({
           tabBarIcon: ({focused, color, size}) => {
             let iconName;
@@ -36,7 +36,7 @@ export default function AppTabs({navigation}) {
 
             if (rn === discoverName) {
               iconName = focused ? "search" : "search-outline";
-            } else if (rn === dashboardName) {
+            } else if (rn === projectsName) {
               iconName = focused ? "home" : "home-outline";
             } else if (rn === messageName) {
               iconName = focused
@@ -59,7 +59,7 @@ export default function AppTabs({navigation}) {
           headerTintColor: '#ffffff', 
         })}>
         <Tab.Screen name={discoverName} component={Discover} />
-        <Tab.Screen name={dashboardName} component={Dashboard} />
+        <Tab.Screen name={projectsName} component={Projects} />
         <Tab.Screen name={messageName} component={Message} />
         <Tab.Screen name={profileName} component={Profile} />
       </Tab.Navigator>

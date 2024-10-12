@@ -27,7 +27,7 @@ export default function Message({ navigation }) {
   const fetchConversations = async () => {
     try {
       const response = await fetch(
-        `http://192.168.137.1:5016/api/messages/conversations`,
+        `http://192.168.0.48:5016/api/messages/conversations`,
         {
           method: 'GET',
           headers: {

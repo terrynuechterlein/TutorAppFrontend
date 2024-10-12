@@ -9,7 +9,7 @@ import React, {useState} from "react";
 
 export default function ProfileCategories() {
   const [selectedTab, setSelectedTab] = useState("Posts");
-  const tabs = ["Posts", "Comments", "Media", "Likes", "Services"];
+  const tabs = ["Resume", "Projects", "Services"];
 
   const handlePress = (tab) => {
     setSelectedTab(tab);

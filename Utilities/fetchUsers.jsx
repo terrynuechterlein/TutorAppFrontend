@@ -17,7 +17,7 @@ export const fetchUsers = async ({ college = [], grade = [], major = [] } = {}, 
   console.log(`Fetching users with params: ${params}`);
 
   try {
-    const response = await fetch(`http://192.168.137.1:5016/api/tutors/allUsers?${params}`);
+    const response = await fetch(`http://192.168.0.48:5016/api/tutors/allUsers?${params}`);
     if (!response.ok) {
       throw new Error('Failed to fetch users');
     }

@@ -7,6 +7,7 @@ import EditProfile from "../Screens/EditProfileScreen";
 import SettingsScreen from "../Screens/SettingsScreen";
 import UserProfile from "../Screens/UserProfile";
 import Chat from "../Screens/Chat"
+import BecomeTutor from "../Screens/BecomeTutor";
 
 import * as SecureStore from "expo-secure-store";
 
@@ -24,6 +25,7 @@ function MainNavigator() {
           <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
           <Stack.Screen name="UserProfile" component={UserProfile} />
           <Stack.Screen name="Chat" component={Chat} />
+          <Stack.Screen name="BecomeTutor" component={BecomeTutor} />
 
         </>
       ) : (

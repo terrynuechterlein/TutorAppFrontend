@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -7,30 +7,35 @@ import {
   TouchableOpacity,
   Alert,
   Platform,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import COLORS from '../../Constants/colors';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import COLORS from "../../Constants/colors";
 import * as SecureStore from "expo-secure-store";
-import { useDispatch } from 'react-redux';
-import { logout } from '../Actions/AuthActions';
-import SearchBar from '../../Components/SearchBar';
+import { useDispatch } from "react-redux";
+import { logout } from "../Actions/AuthActions";
+import SearchBar from "../../Components/SearchBar";
 
 export default function SettingsScreen({ navigation }) {
-
   const dispatch = useDispatch();
-     
+
   const handleSignOut = () => {
     Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
+      "Sign Out",
+      "Are you sure you want to sign out?",
       [
-        { text: 'No' },
-        { text: 'Yes', onPress: () => dispatch(logout()), // Dispatch logout action
-      },
-    ],
-    { cancelable: false }
-  );
-};
+        { text: "No" },
+        {
+          text: "Yes",
+          onPress: () => dispatch(logout()), // Dispatch logout action
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const handleBecomeTutor = () => {
+    navigation.navigate("BecomeTutor");
+  };
 
   return (
     <View style={styles.container}>
@@ -41,6 +46,15 @@ export default function SettingsScreen({ navigation }) {
         <Text style={styles.headerTitle}>Settings</Text>
       </View>
       <SearchBar placeholder="Search settings" />
+
+      <TouchableOpacity style={styles.option} onPress={handleBecomeTutor}>
+        <Ionicons name="school-outline" size={24} color="black" />
+        <View style={styles.optionText}>
+          <Text style={styles.optionTitle}>Become a Tutor</Text>
+          <Text style={styles.optionSubtitle}>Sign up to be a tutor</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color="black" />
+      </TouchableOpacity>
 
       <TouchableOpacity style={styles.option} onPress={handleSignOut}>
         <Ionicons name="log-out-outline" size={24} color="black" />
@@ -60,22 +74,22 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: Platform.OS === 'ios' ? 50 : 30, // Adjust for iOS status bar and push down
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: Platform.OS === "ios" ? 50 : 30, // Adjust for iOS status bar and push down
     paddingBottom: 10,
     paddingHorizontal: 15,
     borderBottomColor: COLORS.lightGray,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     flex: 1,
-    textAlign: 'center', 
+    textAlign: "center",
   },
   option: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 15,
     borderBottomColor: COLORS.lightGray,
   },
@@ -85,7 +99,7 @@ const styles = StyleSheet.create({
   },
   optionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   optionSubtitle: {
     fontSize: 12,

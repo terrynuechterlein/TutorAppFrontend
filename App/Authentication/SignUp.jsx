@@ -39,7 +39,7 @@ export default function SignUp({navigation}) {
     };
 
     try {
-      let response = await fetch("http://192.168.137.1:5016/api/tutors/register", {
+      let response = await fetch("http://192.168.0.48:5016/api/tutors/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
