@@ -2,14 +2,34 @@ import {
   Text,
   View,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
 } from "react-native";
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 
 export default function ProfileCategories() {
-  const [selectedTab, setSelectedTab] = useState("Posts");
-  const tabs = ["Resume", "Projects", "Services"];
+  const [selectedTab, setSelectedTab] = useState("Resume");
+  const [tabs, setTabs] = useState(["Resume", "Projects"]);
+  const userId = useSelector((state) => state.auth.userId);
+
+  useEffect(() => {
+    const checkTutorStatus = async () => {
+      try {
+        const response = await fetch(`http://192.168.0.48:5016/api/tutors/${userId}/isTutor`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.isTutor) {
+            setTabs(["Resume", "Projects", "Services"]);
+          }
+        } else {
+          console.error("Failed to fetch tutor status");
+        }
+      } catch (error) {
+        console.error("Error fetching tutor status:", error);
+      }
+    };
+    checkTutorStatus();
+  }, [userId]);
 
   const handlePress = (tab) => {
     setSelectedTab(tab);

@@ -32,6 +32,8 @@ import IconRow from "../../Components/IconRow";
 import ProfileCategories from "../../Components/ProfileCategories";
 import AboutComponent from "../../Components/AboutComponent";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import {MaterialIcons} from "@expo/vector-icons";
+import {useSelector} from "react-redux";
 
 export default function Profile({navigation}) {
   const [bio, setBio] = useState("");
@@ -51,6 +53,7 @@ export default function Profile({navigation}) {
   const [username, setUsername] = useState("");
   const [school, setSchool] = useState("");
   const [major, setMajor] = useState("");
+  const [isTutor, setIsTutor] = useState(false);
 
   const userId = useSelector((state) => state.auth.userId);
 
@@ -68,9 +71,6 @@ export default function Profile({navigation}) {
           );
           if (response.ok) {
             const data = await response.json();
-            console.log("data info:", data);
-            console.log("Fetched bio:", data.bio);
-            console.log("fetched youtubeURL!: ", data.youtubeUrl);
             setFullName(`${data.firstName} ${data.lastName}`);
             setUsername(data.userName);
             setSchool(data.school);
@@ -81,6 +81,7 @@ export default function Profile({navigation}) {
             setTwitchURL(data.twitchUrl);
             setDiscordURL(data.discordUrl);
             setLinkedInURL(data.linkedInUrl);
+            setIsTutor(data.isTutor);
             console.log("State bio:", bio);
             console.log("State school:", school);
             console.log("State YoutubeURL:", youtubeURL);
@@ -120,11 +121,11 @@ export default function Profile({navigation}) {
         }
       } else {
         console.error("Failed to fetch profile image");
-        setProfileImage(require("../../assets/penguin.png")); 
+        setProfileImage(require("../../assets/penguin.png"));
       }
     } catch (error) {
       console.error("Error fetching profile image:", error);
-      setProfileImage(require("../../assets/penguin.png")); 
+      setProfileImage(require("../../assets/penguin.png"));
     }
   };
 
@@ -207,7 +208,17 @@ export default function Profile({navigation}) {
               />
             </View>
           </TouchableOpacity>
-          <Text style={styles.fullName}>{fullName}</Text>
+          <View style={styles.nameBadgeContainer}>
+            <Text style={styles.fullName}>{fullName}</Text>
+            {isTutor && (
+              <MaterialIcons
+                name="verified"
+                size={24}
+                color="#FFD700"
+                style={styles.badgeIcon}
+              />
+            )}
+          </View>
           <Text style={styles.userName}>@{username}</Text>
 
           <View style={styles.infoRow}>

@@ -8,7 +8,6 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  ImageBackground,
   Image,
   TouchableWithoutFeedback,
   Keyboard,
@@ -28,11 +27,11 @@ export default function BecomeTutor({ navigation }) {
     }
 
     try {
-      // Call your backend API to initiate email verification
-      const response = await fetch(`http://yourapi.com/api/verifyEmail`, {
+      // Call your Spring Boot microservice API to initiate email verification
+      const response = await fetch(`http://192.168.0.124:8080/api/verify/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, email }),
+        body: JSON.stringify({ userId, eduEmail: email }),
       });
 
       if (response.ok) {
@@ -42,7 +41,8 @@ export default function BecomeTutor({ navigation }) {
         );
         navigation.goBack();
       } else {
-        Alert.alert('Error', 'Failed to send verification email.');
+        const errorData = await response.text();
+        Alert.alert('Error', errorData || 'Failed to send verification email.');
       }
     } catch (error) {
       console.error(error);
