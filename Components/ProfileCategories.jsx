@@ -1,21 +1,18 @@
-import {
-  Text,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
-export default function ProfileCategories() {
-  const [selectedTab, setSelectedTab] = useState("Resume");
+export default function ProfileCategories({ activeTab, setActiveTab }) {
+  // const [selectedTab, setSelectedTab] = useState("Resume");
   const [tabs, setTabs] = useState(["Resume", "Projects"]);
   const userId = useSelector((state) => state.auth.userId);
 
   useEffect(() => {
     const checkTutorStatus = async () => {
       try {
-        const response = await fetch(`http://192.168.0.48:5016/api/tutors/${userId}/isTutor`);
+        const response = await fetch(
+          `http://192.168.0.48:5016/api/tutors/${userId}/isTutor`
+        );
         if (response.ok) {
           const data = await response.json();
           if (data.isTutor) {
@@ -32,7 +29,7 @@ export default function ProfileCategories() {
   }, [userId]);
 
   const handlePress = (tab) => {
-    setSelectedTab(tab);
+    setActiveTab(tab); // Update the active tab in parent component (Profile.jsx)
   };
 
   return (
@@ -41,12 +38,13 @@ export default function ProfileCategories() {
         <TouchableOpacity
           key={index}
           onPress={() => handlePress(tab)}
-          style={[styles.tab, selectedTab === tab && styles.selectedTab]}>
+          style={[styles.tab, activeTab === tab && styles.selectedTab]} // Use activeTab instead of selectedTab
+        >
           <Text style={styles.tabText}>{tab}</Text>
           <View
             style={[
               styles.underline,
-              selectedTab === tab
+              activeTab === tab
                 ? styles.activeUnderline
                 : styles.inactiveUnderline,
             ]}
@@ -92,4 +90,3 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
 });
-

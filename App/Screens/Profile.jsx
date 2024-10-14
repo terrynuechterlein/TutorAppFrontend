@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -20,22 +20,23 @@ import Button, {
 import ProfileStats from "../../Components/ProfileStats";
 import FlashMessage from "react-native-flash-message";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
-import {useFocusEffect} from "@react-navigation/native";
-import {faSchool} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { useFocusEffect } from "@react-navigation/native";
+import { faSchool } from "@fortawesome/free-solid-svg-icons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import * as SecureStore from "expo-secure-store"; // Import SecureStore
-import {useSelector} from "react-redux";
+import * as DocumentPicker from "expo-document-picker";
+import { useSelector } from "react-redux";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import IconRow from "../../Components/IconRow";
 import ProfileCategories from "../../Components/ProfileCategories";
 import AboutComponent from "../../Components/AboutComponent";
-import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
-import {MaterialIcons} from "@expo/vector-icons";
-import {useSelector} from "react-redux";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { MaterialIcons } from "@expo/vector-icons";
+import * as FileSystem from "expo-file-system";
 
-export default function Profile({navigation}) {
+export default function Profile({ navigation }) {
   const [bio, setBio] = useState("");
   const [profileImage, setProfileImage] = useState(null);
   const [bannerImage, setBannerImage] = useState(null);
@@ -54,6 +55,8 @@ export default function Profile({navigation}) {
   const [school, setSchool] = useState("");
   const [major, setMajor] = useState("");
   const [isTutor, setIsTutor] = useState(false);
+  const [resumeUrl, setResumeUrl] = useState(null);
+  const [activeTab, setActiveTab] = useState("Resume");
 
   const userId = useSelector((state) => state.auth.userId);
 
@@ -100,6 +103,7 @@ export default function Profile({navigation}) {
   useEffect(() => {
     fetchProfileImage();
     fetchBannerImage();
+    fetchUserResume();
   }, [userId]);
 
   const fetchProfileImage = async () => {
@@ -115,7 +119,7 @@ export default function Profile({navigation}) {
       if (response.ok) {
         const data = await response.json();
         if (data.imageUrl) {
-          setProfileImage({uri: data.imageUrl});
+          setProfileImage({ uri: data.imageUrl });
         } else {
           setProfileImage(require("../../assets/penguin.png")); // Set default image if URL is null/undefined
         }
@@ -142,7 +146,7 @@ export default function Profile({navigation}) {
       if (response.ok) {
         const data = await response.json();
         if (data.imageUrl) {
-          setBannerImage({uri: data.imageUrl});
+          setBannerImage({ uri: data.imageUrl });
         } else {
           setBannerImage(require("../../assets/Study.png")); // Default banner image
         }
@@ -153,6 +157,96 @@ export default function Profile({navigation}) {
     } catch (error) {
       console.error("Error fetching banner image:", error);
       setBannerImage(require("../../assets/Study.png"));
+    }
+  };
+
+  const fetchAndCacheResume = async (resumeUrl) => {
+    try {
+      const cacheDir = FileSystem.cacheDirectory + "resume.pdf";
+
+      // Check if the file is already cached
+      const fileInfo = await FileSystem.getInfoAsync(cacheDir);
+      if (!fileInfo.exists) {
+        console.log("Downloading resume to cache...");
+        await FileSystem.downloadAsync(resumeUrl, cacheDir);
+      }
+
+      // Return the cached file path to be used by react-native-pdf
+      return cacheDir;
+    } catch (error) {
+      console.error("Error caching the PDF:", error);
+      return resumeUrl; // fallback to the original URL in case of error
+    }
+  };
+
+  // Fetch the user's resume and cache it
+  useEffect(() => {
+    if (resumeUrl) {
+      const cacheResume = async () => {
+        const cachedPath = await fetchAndCacheResume(resumeUrl);
+        setResumeUrl(cachedPath); // Update the resume URL with the cached path
+      };
+      cacheResume();
+    }
+  }, [resumeUrl]);
+
+  const fetchUserResume = async () => {
+    try {
+      const response = await fetch(
+        `http://192.168.0.48:5016/api/tutors/${userId}/resume`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setResumeUrl(data.resumeUrl);
+      } else {
+        console.error("Failed to fetch resume");
+      }
+    } catch (error) {
+      console.error("Error fetching resume:", error);
+    }
+  };
+
+  // Function to handle resume upload
+  const handleResumeUpload = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "application/pdf",
+      });
+
+      if (result && result.assets && result.assets.length > 0) {
+        const file = result.assets[0];
+
+        const formData = new FormData();
+        formData.append("file", {
+          uri: file.uri,
+          name: file.name || "resume.pdf",
+          type: file.mimeType || "application/pdf",
+        });
+
+        const response = await fetch(
+          `http://192.168.0.48:5016/api/tutors/${userId}/uploadResume`,
+          {
+            method: "PUT",
+            body: formData,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          setResumeUrl(data.resumeUrl); // Update the resume URL
+        } else {
+          console.error("Failed to upload resume:", response.statusText);
+        }
+      } else if (result.canceled) {
+        console.log("DocumentPicker canceled");
+      } else {
+        console.error("DocumentPicker returned unexpected result:", result);
+      }
+    } catch (error) {
+      console.error("Error uploading resume:", error);
     }
   };
 
@@ -172,15 +266,17 @@ export default function Profile({navigation}) {
 
   return (
     <KeyboardAwareScrollView
-      style={{flex: 1}}
-      resetScrollToCoords={{x: 0, y: 0}}
+      style={{ flex: 1 }}
+      resetScrollToCoords={{ x: 0, y: 0 }}
       scrollEnabled={true}
       extraHeight={200}
-      enableOnAndroid={true}>
+      enableOnAndroid={true}
+    >
       <View style={styles.bannerContainer}>
         <TouchableOpacity
           onPress={handleSettingsPress}
-          style={[styles.iconWrapper, styles.gearIconWrapper]}>
+          style={[styles.iconWrapper, styles.gearIconWrapper]}
+        >
           <FontAwesome name="gear" size={24} color="#FFF" />
         </TouchableOpacity>
         <Image
@@ -259,11 +355,41 @@ export default function Profile({navigation}) {
       </View>
 
       <View style={styles.menuContainer}>
-        <ProfileCategories />
+        <ProfileCategories activeTab={activeTab} setActiveTab={setActiveTab} />
       </View>
 
       {/* Horizontal Line */}
       <View style={styles.horizontalLine} />
+
+      {activeTab === "Resume" && resumeUrl ? (
+        <View style={styles.resumeContainer}>
+          <Text style={styles.resumeText}>Your Resume:</Text>
+          {/* Display the PDF directly */}
+          <Pdf
+            source={{ uri: resumeUrl, cache: true }}
+            onLoadComplete={(numberOfPages) => {
+              console.log(`Number of pages: ${numberOfPages}`);
+            }}
+            onPageChanged={(page, numberOfPages) => {
+              console.log(`Current page: ${page}`);
+            }}
+            onError={(error) => {
+              console.error(error);
+            }}
+            style={styles.pdf} // Customize the size here
+          />
+        </View>
+      ) : (
+        <View style={styles.addResumeContainer}>
+          <TouchableOpacity
+            onPress={handleResumeUpload}
+            style={styles.plusIcon}
+          >
+            <AntDesign name="pluscircleo" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.addResumeText}>Add your resume</Text>
+        </View>
+      )}
     </KeyboardAwareScrollView>
   );
 }
@@ -380,5 +506,32 @@ const styles = StyleSheet.create({
   },
   AboutContainer: {
     marginTop: 30,
+  },
+  resumeContainer: {
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#ccc",
+    marginTop: 10,
+  },
+  addResumeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  plusIcon: {
+    marginRight: 10,
+  },
+  addResumeText: {
+    fontSize: 16,
+    color: "#555",
+  },
+  resumeText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  pdf: {
+    flex: 1,
+    width: "100%",
+    height: 600, // Customize the height as needed
   },
 });
