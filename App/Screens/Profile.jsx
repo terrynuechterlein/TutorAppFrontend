@@ -35,6 +35,8 @@ import AboutComponent from "../../Components/AboutComponent";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
+import { WebView } from "react-native-webview";
+import DocumentScanner from "react-native-document-scanner-plugin";
 
 export default function Profile({ navigation }) {
   const [bio, setBio] = useState("");
@@ -57,6 +59,7 @@ export default function Profile({ navigation }) {
   const [isTutor, setIsTutor] = useState(false);
   const [resumeUrl, setResumeUrl] = useState(null);
   const [activeTab, setActiveTab] = useState("Resume");
+  const [resumeLocalUri, setResumeLocalUri] = useState(null);
 
   const userId = useSelector((state) => state.auth.userId);
 
@@ -160,36 +163,6 @@ export default function Profile({ navigation }) {
     }
   };
 
-  const fetchAndCacheResume = async (resumeUrl) => {
-    try {
-      const cacheDir = FileSystem.cacheDirectory + "resume.pdf";
-
-      // Check if the file is already cached
-      const fileInfo = await FileSystem.getInfoAsync(cacheDir);
-      if (!fileInfo.exists) {
-        console.log("Downloading resume to cache...");
-        await FileSystem.downloadAsync(resumeUrl, cacheDir);
-      }
-
-      // Return the cached file path to be used by react-native-pdf
-      return cacheDir;
-    } catch (error) {
-      console.error("Error caching the PDF:", error);
-      return resumeUrl; // fallback to the original URL in case of error
-    }
-  };
-
-  // Fetch the user's resume and cache it
-  useEffect(() => {
-    if (resumeUrl) {
-      const cacheResume = async () => {
-        const cachedPath = await fetchAndCacheResume(resumeUrl);
-        setResumeUrl(cachedPath); // Update the resume URL with the cached path
-      };
-      cacheResume();
-    }
-  }, [resumeUrl]);
-
   const fetchUserResume = async () => {
     try {
       const response = await fetch(
@@ -206,21 +179,41 @@ export default function Profile({ navigation }) {
     }
   };
 
-  // Function to handle resume upload
   const handleResumeUpload = async () => {
     try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: "application/pdf",
-      });
+      if (resumeUrl || resumeLocalUri) {
+        Alert.alert(
+          "Replace Resume",
+          "Do you want to replace your existing resume?",
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Yes", onPress: () => scanDocument() },
+          ],
+          { cancelable: true }
+        );
+      } else {
+        scanDocument();
+      }
+    } catch (error) {
+      console.error("Error during resume upload:", error);
+    }
+  };
 
-      if (result && result.assets && result.assets.length > 0) {
-        const file = result.assets[0];
+  const scanDocument = async () => {
+    try {
+      const { scannedImages } = await DocumentScanner.scanDocument({
+        letUserAdjustCrop: true,
+        maxNumDocuments: 1,
+      });
+      if (scannedImages && scannedImages.length > 0) {
+        const imageUri = scannedImages[0];
+        setResumeLocalUri(imageUri);
 
         const formData = new FormData();
         formData.append("file", {
-          uri: file.uri,
-          name: file.name || "resume.pdf",
-          type: file.mimeType || "application/pdf",
+          uri: imageUri,
+          name: "resume.jpg",
+          type: "image/jpeg",
         });
 
         const response = await fetch(
@@ -236,19 +229,22 @@ export default function Profile({ navigation }) {
 
         if (response.ok) {
           const data = await response.json();
-          setResumeUrl(data.resumeUrl); // Update the resume URL
+          setResumeUrl(data.resumeUrl);
+          setResumeLocalUri(null);
         } else {
           console.error("Failed to upload resume:", response.statusText);
         }
-      } else if (result.canceled) {
-        console.log("DocumentPicker canceled");
-      } else {
-        console.error("DocumentPicker returned unexpected result:", result);
       }
     } catch (error) {
-      console.error("Error uploading resume:", error);
+      console.error("Error scanning document:", error);
     }
   };
+
+  useEffect(() => {
+    if (resumeUrl) {
+      console.log("Resume URL:", resumeUrl);
+    }
+  }, [resumeUrl]);
 
   const handleSettingsPress = () => {
     navigation.navigate("SettingsScreen");
@@ -263,6 +259,70 @@ export default function Profile({ navigation }) {
       userId: userId,
     });
   };
+
+  // Define tab content
+  let tabContent = null;
+
+  if (activeTab === "Resume") {
+    console.log("resumeLocalUri:", resumeLocalUri);
+    console.log("resumeUrl:", resumeUrl);
+
+    if (resumeLocalUri) {
+      tabContent = (
+        <View style={styles.resumeContainer}>
+          <Text style={styles.resumeText}>Your Resume:</Text>
+          <Image source={{ uri: resumeLocalUri }} style={styles.resumeImage} />
+        </View>
+      );
+    } else if (
+      resumeUrl &&
+      resumeUrl !== "" &&
+      resumeUrl !== "null" &&
+      resumeUrl !== "undefined"
+    ) {
+      tabContent = (
+        <View style={styles.resumeContainer}>
+          <Text style={styles.resumeText}>Your Resume:</Text>
+          <Image source={{ uri: resumeUrl }} style={styles.resumeImage} />
+        </View>
+      );
+    } else {
+      tabContent = (
+        <View style={styles.addResumeContainer}>
+          <TouchableOpacity
+            onPress={handleResumeUpload}
+            style={styles.plusIcon}
+          >
+            <AntDesign name="pluscircleo" size={50} color="#ff8c00" />
+          </TouchableOpacity>
+          <Text style={styles.addResumeText}>Scan your resume</Text>
+        </View>
+      );
+    }
+  } else if (activeTab === "Projects") {
+    tabContent = (
+      <View style={styles.projectsContainer}>
+        {/* Add your projects content here */}
+        <Text style={styles.projectsText}>Projects content goes here</Text>
+      </View>
+    );
+  } else if (activeTab === "Services") {
+    tabContent = (
+      <View style={styles.servicesContainer}>
+        {/* Add your services content here */}
+        <Text style={styles.servicesText}>Services content goes here</Text>
+      </View>
+    );
+  }
+
+  // useEffect(() => {
+  //   console.log("resumeUrl after fetch:", resumeUrl);
+  // }, [resumeUrl]);
+  
+  // useEffect(() => {
+  //   console.log("resumeLocalUri after scanning:", resumeLocalUri);
+  // }, [resumeLocalUri]);
+  
 
   return (
     <KeyboardAwareScrollView
@@ -360,36 +420,7 @@ export default function Profile({ navigation }) {
 
       {/* Horizontal Line */}
       <View style={styles.horizontalLine} />
-
-      {activeTab === "Resume" && resumeUrl ? (
-        <View style={styles.resumeContainer}>
-          <Text style={styles.resumeText}>Your Resume:</Text>
-          {/* Display the PDF directly */}
-          <Pdf
-            source={{ uri: resumeUrl, cache: true }}
-            onLoadComplete={(numberOfPages) => {
-              console.log(`Number of pages: ${numberOfPages}`);
-            }}
-            onPageChanged={(page, numberOfPages) => {
-              console.log(`Current page: ${page}`);
-            }}
-            onError={(error) => {
-              console.error(error);
-            }}
-            style={styles.pdf} // Customize the size here
-          />
-        </View>
-      ) : (
-        <View style={styles.addResumeContainer}>
-          <TouchableOpacity
-            onPress={handleResumeUpload}
-            style={styles.plusIcon}
-          >
-            <AntDesign name="pluscircleo" size={24} color="black" />
-          </TouchableOpacity>
-          <Text style={styles.addResumeText}>Add your resume</Text>
-        </View>
-      )}
+      {tabContent}
     </KeyboardAwareScrollView>
   );
 }
@@ -509,29 +540,30 @@ const styles = StyleSheet.create({
   },
   resumeContainer: {
     padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-    marginTop: 10,
+    alignItems: "center",
   },
   addResumeContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
   },
   plusIcon: {
     marginRight: 10,
   },
   addResumeText: {
-    fontSize: 16,
-    color: "#555",
+    fontSize: 18,
+    color: "#333",
+    fontWeight: "500",
   },
   resumeText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
   },
-  pdf: {
-    flex: 1,
+  resumeImage: {
     width: "100%",
-    height: 600, // Customize the height as needed
+    height: 600,
+    resizeMode: "contain",
   },
 });
