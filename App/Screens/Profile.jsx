@@ -37,6 +37,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
 import { WebView } from "react-native-webview";
 import DocumentScanner from "react-native-document-scanner-plugin";
+import ServiceCard from "../../Components/ServiceCard";
 
 export default function Profile({ navigation }) {
   const [bio, setBio] = useState("");
@@ -60,6 +61,12 @@ export default function Profile({ navigation }) {
   const [resumeUrl, setResumeUrl] = useState(null);
   const [activeTab, setActiveTab] = useState("Resume");
   const [resumeLocalUri, setResumeLocalUri] = useState(null);
+  const [services, setServices] = useState([]);
+  const [isServiceModalVisible, setIsServiceModalVisible] = useState(false);
+  const [serviceTitle, setServiceTitle] = useState("");
+  const [serviceDescription, setServiceDescription] = useState("");
+  const [servicePrice, setServicePrice] = useState("");
+  const [tiers, setTiers] = useState([]);
 
   const userId = useSelector((state) => state.auth.userId);
 
@@ -260,6 +267,94 @@ export default function Profile({ navigation }) {
     });
   };
 
+  useEffect(() => {
+    if (activeTab === "Services") {
+      fetchServices();
+    }
+  }, [activeTab]);
+
+  const fetchServices = async () => {
+    try {
+      const response = await fetch(
+        `http://192.168.0.48:5016/api/tutors/${userId}/services`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setServices(data);
+      } else {
+        console.error("Failed to fetch services");
+      }
+    } catch (error) {
+      console.error("Error fetching services:", error);
+    }
+  };
+
+  const addTier = () => {
+    setTiers([...tiers, { title: "", price: "" }]);
+  };
+
+  const updateTierTitle = (index, text) => {
+    const newTiers = [...tiers];
+    newTiers[index].title = text;
+    setTiers(newTiers);
+  };
+
+  const updateTierPrice = (index, text) => {
+    const newTiers = [...tiers];
+    newTiers[index].price = text;
+    setTiers(newTiers);
+  };
+
+  const removeTier = (index) => {
+    const newTiers = [...tiers];
+    newTiers.splice(index, 1);
+    setTiers(newTiers);
+  };
+
+  const handleSaveService = async () => {
+    if (!serviceTitle || !serviceDescription || !servicePrice) {
+      Alert.alert("Please fill in all required fields");
+      return;
+    }
+
+    const serviceData = {
+      title: serviceTitle,
+      description: serviceDescription,
+      price: parseFloat(servicePrice),
+      tiers: tiers.map((tier) => ({
+        title: tier.title,
+        price: parseFloat(tier.price),
+      })),
+    };
+
+    try {
+      const response = await fetch(
+        `http://192.168.0.48:5016/api/tutors/${userId}/services`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(serviceData),
+        }
+      );
+
+      if (response.ok) {
+        const newService = await response.json();
+        setServices([...services, newService]);
+        setIsServiceModalVisible(false);
+        setServiceTitle("");
+        setServiceDescription("");
+        setServicePrice("");
+        setTiers([]);
+      } else {
+        console.error("Failed to create service");
+      }
+    } catch (error) {
+      console.error("Error creating service:", error);
+    }
+  };
+
   // Define tab content
   let tabContent = null;
 
@@ -318,11 +413,10 @@ export default function Profile({ navigation }) {
   // useEffect(() => {
   //   console.log("resumeUrl after fetch:", resumeUrl);
   // }, [resumeUrl]);
-  
+
   // useEffect(() => {
   //   console.log("resumeLocalUri after scanning:", resumeLocalUri);
   // }, [resumeLocalUri]);
-  
 
   return (
     <KeyboardAwareScrollView
