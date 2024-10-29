@@ -11,7 +11,7 @@ import {
 
 const AutocompleteInput = ({ list, onSelect, placeholder }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredItems, setFilteredItems] = useState(list); // Display all items initially
+  const [filteredItems, setFilteredItems] = useState(list); 
   const [isFocused, setIsFocused] = useState(false); 
 
   useEffect(() => {
@@ -21,7 +21,7 @@ const AutocompleteInput = ({ list, onSelect, placeholder }) => {
       );
       setFilteredItems(filtered);
     } else {
-      setFilteredItems(list); // Show all items when there's no search term
+      setFilteredItems(list); 
     }
   }, [searchTerm, list]);
 
@@ -30,8 +30,8 @@ const AutocompleteInput = ({ list, onSelect, placeholder }) => {
   }, [searchTerm]);
 
   const handleSelect = (item) => {
-    setSearchTerm(item.label); // Reflect the selected item in the input field
-    setIsFocused(false); // Dismiss the list upon selection
+    setSearchTerm(item.label); 
+    setIsFocused(false); 
     onSelect(item);
   };
 
@@ -43,8 +43,7 @@ const AutocompleteInput = ({ list, onSelect, placeholder }) => {
         onChangeText={text => setSearchTerm(text)}
         style={styles.input}
         placeholderTextColor="#787878"
-        onFocus={() => setIsFocused(true)} // Set focus state to true when input is focused
-        // onBlur={() => setIsFocused(false)} // Set focus state to false when input loses focus
+        onFocus={() => setIsFocused(true)} 
       />
       {isFocused && (
         <FlatList

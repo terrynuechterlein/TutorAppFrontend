@@ -25,15 +25,14 @@ export default function BannerModal({ isVisible, onClose, onBannerImageTaken }) 
 
   // If the user doesn't cancel the operation, send the chosen image back
   if (!result.canceled && result.assets && result.assets.length > 0) {
-    const imageUri = result.assets[0].uri; // Accessing the correct URI
-    onClose(); // Close the modal
+    const imageUri = result.assets[0].uri; 
+    onClose(); 
     console.log("Banner image URI:", imageUri);
-    onBannerImageTaken(imageUri); // Send the selected image back to the profile screen
+    onBannerImageTaken(imageUri); 
   }
   };
 
   const handleTakePhoto = async () => {
-    // Ask for permission to access the camera
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
   
     if (permissionResult.granted === false) {
@@ -41,7 +40,6 @@ export default function BannerModal({ isVisible, onClose, onBannerImageTaken }) 
       return;
     }
   
-    // Launch the camera with the following settings
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: false, 
     });

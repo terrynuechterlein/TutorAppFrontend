@@ -1,6 +1,4 @@
-// Components/CreateProjectModal.js
-
-import React, { useState } from "react";
+import React, {useState} from "react";
 import {
   Modal,
   View,
@@ -11,11 +9,14 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import {LinearGradient} from "expo-linear-gradient";
 import COLORS from "../Constants/colors";
-import { useSelector } from "react-redux";
+import {useSelector} from "react-redux";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import {BlurView} from "expo-blur";
 
 export default function CreateProjectModal({
   isVisible,
@@ -34,7 +35,7 @@ export default function CreateProjectModal({
     }
 
     try {
-      const response = await fetch("http://192.168.0.48:5016/api/projects", {
+      const response = await fetch("http://172.20.20.20:5016/api/projects", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,8 +56,8 @@ export default function CreateProjectModal({
           isOpenToRequests: isOpenToRequests,
           creator: {
             id: userId,
-            userName: "YourUserName", // Replace with actual userName from store
-            profilePictureUrl: "YourProfilePictureUrl", // Replace with actual URL
+            userName: "UserName", 
+            profilePictureUrl: "ProfilePictureUrl", 
           },
           members: [], // Initially empty
         };
@@ -75,116 +76,135 @@ export default function CreateProjectModal({
   };
 
   return (
-    <Modal visible={isVisible} animationType="slide">
-      <LinearGradient
-        colors={["#ff8c00", "#4B0082"]}
-        style={styles.modalBackground}
-      >
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-        >
-          <ScrollView contentContainerStyle={styles.modalContainer}>
-            <View style={styles.card}>
-              <Text style={styles.modalTitle}>Create Project</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Project Name"
-                placeholderTextColor="#ccc"
-                value={projectName}
-                onChangeText={setProjectName}
-              />
-              <TextInput
-                style={[styles.input, styles.descriptionInput]}
-                placeholder="Description"
-                placeholderTextColor="#ccc"
-                value={description}
-                onChangeText={setDescription}
-                multiline
-              />
-              {/* Open to Requests Toggle */}
-              <View style={styles.toggleContainer}>
-                <Text style={styles.toggleLabel}>Open to Requests:</Text>
-                <TouchableOpacity
-                  style={[
-                    styles.toggleButton,
-                    {
-                      backgroundColor: isOpenToRequests
-                        ? COLORS.appblue
-                        : "#ccc",
-                    },
-                  ]}
-                  onPress={() => setIsOpenToRequests(!isOpenToRequests)}
-                >
-                  <Text style={styles.toggleButtonText}>
-                    {isOpenToRequests ? "Yes" : "No"}
-                  </Text>
-                </TouchableOpacity>
+    <Modal visible={isVisible} animationType="slide" transparent={true}>
+      <KeyboardAvoidingView
+        style={{flex: 1}}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.modalOverlay}>
+            <BlurView intensity={50} tint="dark" style={styles.blurContainer}>
+              <View style={styles.modalContent}>
+                <LinearGradient
+                  colors={["rgba(255,140,0,0.9)", "rgba(75,0,130,0.9)"]}
+                  style={styles.gradientBackground}>
+                  {/* Close Icon */}
+                  <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={onClose}>
+                    <Ionicons name="close" size={30} color="#fff" />
+                  </TouchableOpacity>
+
+                  {/* Modal Title */}
+                  <Text style={styles.modalTitle}>Create Project</Text>
+
+                  {/* Project Name Input */}
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Project Name"
+                    placeholderTextColor="#ddd"
+                    value={projectName}
+                    onChangeText={setProjectName}
+                  />
+
+                  {/* Description Input */}
+                  <TextInput
+                    style={[styles.input, styles.descriptionInput]}
+                    placeholder="Description"
+                    placeholderTextColor="#ddd"
+                    value={description}
+                    onChangeText={setDescription}
+                    multiline
+                  />
+
+                  {/* Open to Requests Toggle */}
+                  <View style={styles.toggleContainer}>
+                    <Text style={styles.toggleLabel}>Open to Requests:</Text>
+                    <TouchableOpacity
+                      style={[
+                        styles.toggleButton,
+                        {
+                          backgroundColor: isOpenToRequests
+                            ? "rgba(0, 255, 0, 0.7)"
+                            : "rgba(255, 0, 0, 0.7)",
+                        },
+                      ]}
+                      onPress={() => setIsOpenToRequests(!isOpenToRequests)}>
+                      <Text style={styles.toggleButtonText}>
+                        {isOpenToRequests ? "Yes" : "No"}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Buttons */}
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      style={styles.cancelButton}
+                      onPress={onClose}>
+                      <Text style={styles.cancelButtonText}>Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.createButton}
+                      onPress={handleCreateProject}>
+                      <Text style={styles.createButtonText}>Create</Text>
+                    </TouchableOpacity>
+                  </View>
+                </LinearGradient>
               </View>
-              {/* Buttons */}
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={onClose}
-                >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.createButton}
-                  onPress={handleCreateProject}
-                >
-                  <Text style={styles.createButtonText}>Create</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
-        {/* Close Icon */}
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Ionicons name="close" size={30} color="#fff" />
-        </TouchableOpacity>
-      </LinearGradient>
+            </BlurView>
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  modalBackground: {
+  modalOverlay: {
     flex: 1,
-  },
-  modalContainer: {
-    flexGrow: 1,
+    backgroundColor: "rgba(0,0,0,0.5)", 
     justifyContent: "center",
-    paddingHorizontal: 20,
+    alignItems: "center",
   },
-  card: {
-    backgroundColor: "#fff",
+  blurContainer: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
     borderRadius: 20,
-    padding: 20,
-    elevation: 5,
-    // Shadow for iOS
+    width: "85%",
+    overflow: "hidden",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
-    shadowRadius: 5,
-    // For Android
+    shadowRadius: 4,
     elevation: 5,
+  },
+  gradientBackground: {
+    padding: 20,
+  },
+  closeButton: {
+    position: "absolute",
+    top: 15,
+    right: 15,
+    zIndex: 10,
   },
   modalTitle: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "bold",
-    color: COLORS.appblue,
+    color: "#fff",
     marginBottom: 20,
     textAlign: "center",
   },
   input: {
-    borderColor: "#eee",
+    borderColor: "rgba(255,255,255,0.5)",
     borderWidth: 1,
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
     fontSize: 16,
-    color: "#333",
+    color: "#fff",
   },
   descriptionInput: {
     height: 120,
@@ -197,6 +217,7 @@ const styles = StyleSheet.create({
   },
   toggleLabel: {
     fontSize: 18,
+    color: "#fff",
     marginRight: 10,
   },
   toggleButton: {
@@ -213,7 +234,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   cancelButton: {
-    backgroundColor: "#ccc",
+    backgroundColor: "rgba(255,255,255,0.3)",
     paddingVertical: 12,
     paddingHorizontal: 40,
     borderRadius: 10,
@@ -223,7 +244,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   createButton: {
-    backgroundColor: COLORS.appblue,
+    backgroundColor: "rgba(0,0,0,0.3)",
     paddingVertical: 12,
     paddingHorizontal: 40,
     borderRadius: 10,
@@ -231,10 +252,5 @@ const styles = StyleSheet.create({
   createButtonText: {
     color: "#fff",
     fontSize: 18,
-  },
-  closeButton: {
-    position: "absolute",
-    top: 40,
-    right: 20,
   },
 });

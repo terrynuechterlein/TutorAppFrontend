@@ -17,12 +17,10 @@ import {gradeList} from "../App/Data/GradesList";
 import {Ionicons} from "@expo/vector-icons";
 import { BlurView } from "@react-native-community/blur";
 
-
 const FilterModal = ({isVisible, onClose, schoolList, applyFilters}) => {
   const [temporarySelections, setTemporarySelections] = useState({});
 
   const handleSelection = (type, selection) => {
-    // Update temporary selections without closing the modal
     setTemporarySelections((prevSelections) => ({
       ...prevSelections,
       [type]: selection,
@@ -30,7 +28,6 @@ const FilterModal = ({isVisible, onClose, schoolList, applyFilters}) => {
   };
 
   const handleApplyFilters = () => {
-    // Apply all temporary selections and then close the modal
     Object.keys(temporarySelections).forEach((type) => {
       if (temporarySelections[type] && temporarySelections[type].label) {
         applyFilters(type, temporarySelections[type]);

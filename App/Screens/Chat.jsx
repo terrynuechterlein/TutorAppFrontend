@@ -14,13 +14,12 @@ import {
 } from "react-native";
 import {Ionicons} from "@expo/vector-icons";
 import {useSelector} from "react-redux";
-import { jwtDecode } from "jwt-decode";
-// import "core-js/stable/atob";
+import {jwtDecode} from "jwt-decode";
 
 const Chat = ({route, navigation}) => {
-  const [messages, setMessages] = useState([]); // Replace with actual state management
+  const [messages, setMessages] = useState([]); 
   const [inputText, setInputText] = useState("");
-  const {user} = route.params; // Assuming `user` contains profilePictureUrl and fullName
+  const {user} = route.params; 
   const {token, userId} = useSelector((state) => state.auth);
 
   const scrollViewRef = useRef();
@@ -28,7 +27,7 @@ const Chat = ({route, navigation}) => {
   const fetchMessages = async () => {
     try {
       const response = await fetch(
-        `http://192.168.0.48:5016/api/messages/conversation/${user.id}`,
+        `http://172.20.20.20:5016/api/messages/conversation/${user.id}`,
         {
           method: "GET",
           headers: {
@@ -64,7 +63,7 @@ const Chat = ({route, navigation}) => {
     if (text) {
       console.log("sendMessage called with text:", text);
       try {
-        const response = await fetch(`http://192.168.0.48:5016/api/messages`, {
+        const response = await fetch(`http://172.20.20.20:5016/api/messages`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -89,27 +88,26 @@ const Chat = ({route, navigation}) => {
             },
           ]);
           setInputText("");
-          scrollViewRef.current.scrollToEnd({ animated: true });
+          scrollViewRef.current.scrollToEnd({animated: true});
         } else {
           console.error("Failed to send message:", response.status);
         }
       } catch (error) {
         console.error("Failed to send message:", error);
       }
-    }else {
+    } else {
       console.log("sendMessage called with empty text");
     }
   };
   console.log("Token:", token);
 
-  const getImageSource = (uri, defaultImage) => (uri ? { uri } : defaultImage);
+  const getImageSource = (uri, defaultImage) => (uri ? {uri} : defaultImage);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{flex: 1}}>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS == "ios" ? "padding" : "height"}
-      >
+        style={{flex: 1}}
+        behavior={Platform.OS == "ios" ? "padding" : "height"}>
         <View style={styles.container}>
           <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -128,19 +126,17 @@ const Chat = ({route, navigation}) => {
             style={styles.messageContainer}
             ref={scrollViewRef}
             onContentSizeChange={() =>
-              scrollViewRef.current.scrollToEnd({ animated: true })
-            }
-          >
+              scrollViewRef.current.scrollToEnd({animated: true})
+            }>
             {messages.map((message, index) => (
               <View key={index} style={styles.messageWrapper}>
                 <Text
                   style={[
                     styles.timestamp,
                     message.senderId === userId
-                      ? { alignSelf: "flex-end", marginRight: 10 }
-                      : { alignSelf: "flex-start", marginLeft: 10 },
-                  ]}
-                >
+                      ? {alignSelf: "flex-end", marginRight: 10}
+                      : {alignSelf: "flex-start", marginLeft: 10},
+                  ]}>
                   {new Date(message.timestamp).toLocaleTimeString()}
                 </Text>
                 <View
@@ -149,8 +145,7 @@ const Chat = ({route, navigation}) => {
                     message.senderId === userId
                       ? styles.senderBubble
                       : styles.receiverBubble,
-                  ]}
-                >
+                  ]}>
                   <Text style={styles.messageText}>{message.content}</Text>
                 </View>
               </View>
@@ -167,8 +162,7 @@ const Chat = ({route, navigation}) => {
             <TouchableOpacity
               onPress={() => {
                 sendMessage(inputText);
-              }}
-            >
+              }}>
               <Ionicons name="send" size={24} color="rgba(0, 120, 255, 1)" />
             </TouchableOpacity>
           </View>
@@ -262,5 +256,3 @@ const styles = StyleSheet.create({
 });
 
 export default Chat;
-
-

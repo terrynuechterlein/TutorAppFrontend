@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from "react";
 import {
   View,
   Text,
@@ -6,13 +6,16 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
-} from 'react-native';
-import { useSelector } from 'react-redux';
-import { LinearGradient } from 'expo-linear-gradient';
+} from "react-native";
+import {useSelector} from "react-redux";
+import {LinearGradient} from "expo-linear-gradient";
+import defaultProfileImage from "../../assets/default_profile.png";
+import useTheme from "../Hooks/useTheme";
 
-export default function Message({ navigation }) {
+export default function Message({navigation}) {
   const [conversations, setConversations] = useState([]);
-  const { token, userId } = useSelector((state) => state.auth);
+  const {token, userId} = useSelector((state) => state.auth);
+  const {themeColors} = useTheme();
 
   useEffect(() => {
     fetchConversations();
@@ -27,75 +30,86 @@ export default function Message({ navigation }) {
   const fetchConversations = async () => {
     try {
       const response = await fetch(
-        `http://192.168.0.48:5016/api/messages/conversations`,
+        `http://172.20.20.20:5016/api/messages/conversations`,
         {
-          method: 'GET',
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         }
       );
 
       if (response.ok) {
         const data = await response.json();
+        console.log(data); // Log the data to inspect property names and values
         setConversations(data);
       } else {
-        console.error('Failed to fetch conversations:', response.status);
+        console.error("Failed to fetch conversations:", response.status);
       }
     } catch (error) {
-      console.error('Failed to fetch conversations:', error);
+      console.error("Failed to fetch conversations:", error);
     }
   };
 
-  const getImageSource = (uri, defaultImage) => (uri ? { uri } : defaultImage);
+  const getImageSource = (uri, defaultImage) => {
+    if (uri) {
+      return {uri};
+    } else {
+      return defaultImage;
+    }
+  };
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.navigate('Chat', { user: {
-          id: item.userId,
-          profilePictureUrl: item.ProfilePictureUrl,
-          userName: item.UserName,
-          firstName: item.FirstName,
-          lastName: item.LastName,
-          fullName: `${item.FirstName} ${item.LastName}`
-        } });
-      }}
-    >
-      <LinearGradient
-        colors={['rgba(0, 120, 255, 1)', '#ff8c00']}
-        start={[0, 0]}
-        end={[1, 0]}
-        style={styles.conversationItem}
-      >
-        <Image
-          source={getImageSource(
-            item.profilePictureUrl,
-            // require('../../assets/default_profile.png')
-          )}
-          style={styles.profilePic}
-        />
-        <View style={styles.conversationDetails}>
-          <Text style={styles.userName}>{item.userName}</Text>
-          <Text style={styles.lastMessage} numberOfLines={1}>
-            {item.lastMessage}
+  const renderItem = ({item}) => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("Chat", {
+            user: {
+              id: item.userId,
+              profilePictureUrl: item.profilePictureUrl,
+              userName: item.userName,
+              firstName: item.firstName,
+              lastName: item.lastName,
+              fullName: `${item.firstName} ${item.lastName}`,
+            },
+          });
+        }}>
+        <LinearGradient
+          colors={["rgba(0, 120, 255, 1)", "#ff8c00"]}
+          start={[0, 0]}
+          end={[1, 0]}
+          style={styles.conversationItem}>
+          <Image
+            source={getImageSource(item.profilePictureUrl, defaultProfileImage)}
+            style={styles.profilePic}
+          />
+
+          <View style={styles.conversationDetails}>
+            <Text style={styles.userName}>{item.userName}</Text>
+            <Text style={styles.lastMessage} numberOfLines={1}>
+              {item.lastMessage}
+            </Text>
+          </View>
+          <Text style={styles.timestamp}>
+            {new Date(item.timestamp).toLocaleTimeString()}
           </Text>
-        </View>
-        <Text style={styles.timestamp}>
-          {new Date(item.timestamp).toLocaleTimeString()}
-        </Text>
-      </LinearGradient>
-    </TouchableOpacity>
-  );
+        </LinearGradient>
+      </TouchableOpacity>
+    );
+  };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: themeColors.gray}]}>
       <FlatList
         data={conversations}
-        keyExtractor={(item) => item.userId}
+        keyExtractor={(item) => item.UserId}
         renderItem={renderItem}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ItemSeparatorComponent={() => (
+          <View
+            style={[styles.separator, {backgroundColor: themeColors.lightGray}]}
+          />
+        )}
       />
     </View>
   );
@@ -104,11 +118,11 @@ export default function Message({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e5e5e5',
+    // backgroundColor: "#e5e5e5",
   },
   conversationItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 10,
     borderRadius: 15,
     marginHorizontal: 10,
@@ -125,19 +139,19 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   userName: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 16,
-    color: '#fff',
+    color: "#fff",
   },
   lastMessage: {
-    color: '#fff',
+    color: "#fff",
   },
   timestamp: {
     fontSize: 12,
-    color: '#fff',
+    color: "#fff",
   },
   separator: {
     height: 1,
-    backgroundColor: '#ddd',
+    backgroundColor: "#ddd",
   },
 });

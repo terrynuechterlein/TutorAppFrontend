@@ -1,9 +1,8 @@
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import {Text, View, StyleSheet, TouchableOpacity} from "react-native";
+import React, {useState, useEffect} from "react";
+import {useSelector} from "react-redux";
 
-export default function ProfileCategories({ activeTab, setActiveTab }) {
-  // const [selectedTab, setSelectedTab] = useState("Resume");
+export default function ProfileCategories({activeTab, setActiveTab}) {
   const [tabs, setTabs] = useState(["Resume", "Projects"]);
   const userId = useSelector((state) => state.auth.userId);
 
@@ -11,7 +10,7 @@ export default function ProfileCategories({ activeTab, setActiveTab }) {
     const checkTutorStatus = async () => {
       try {
         const response = await fetch(
-          `http://192.168.0.48:5016/api/tutors/${userId}/isTutor`
+          `http://172.20.20.20:5016/api/tutors/${userId}/isTutor`
         );
         if (response.ok) {
           const data = await response.json();

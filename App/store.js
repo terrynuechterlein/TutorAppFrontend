@@ -1,21 +1,21 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { thunk as ReduxThunk } from 'redux-thunk';
 import AuthReducer from './Reducers/AuthReducer';
+import ThemeReducer from './Reducers/ThemeReducer'; // Import ThemeReducer
 import { persistReducer, persistStore } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createLogger } from 'redux-logger';
-
-console.log("ReduxThunk is a function:", typeof ReduxThunk === "function");
 
 // Persist config
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['auth'], // Specifies which reducers to persist
+  whitelist: ['auth', 'theme'], 
 };
 
 const rootReducer = combineReducers({
   auth: AuthReducer,
+  theme: ThemeReducer, 
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -23,7 +23,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 const loggerMiddleware = createLogger();
 
 const store = createStore(
-  persistedReducer, 
+  persistedReducer,
   applyMiddleware(ReduxThunk, loggerMiddleware)
 );
 

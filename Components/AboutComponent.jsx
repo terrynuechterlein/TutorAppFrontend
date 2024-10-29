@@ -20,8 +20,7 @@ export default function AboutComponent({summary, editable = false}) {
   useEffect(() => {
     setBioText(summary); // Update bioText whenever summary prop changes
   }, [summary]);
-  
-  // Toggle the edit mode
+
   const toggleEditMode = () => {
     console.log(`EditMode after toggle: ${!editMode}`);
 
@@ -30,14 +29,13 @@ export default function AboutComponent({summary, editable = false}) {
     }
     setEditMode(!editMode);
 
-    // If turning off edit mode and bioText is empty, reset to initial summary
     if (editMode && !bioText.trim()) {
       setBioText(summary);
     }
   };
 
   const updateBio = async () => {
-    const url = `http://192.168.0.48:5016/api/tutors/${userId}/updateBio`;
+    const url = `http://172.20.20.20:5016/api/tutors/${userId}/updateBio`;
     console.log(`Updating bio for userId: ${userId} with bioText: ${bioText}`);
 
     try {
@@ -46,7 +44,7 @@ export default function AboutComponent({summary, editable = false}) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ Bio: bioText }), 
+        body: JSON.stringify({Bio: bioText}),
       });
 
       if (response.ok) {
@@ -69,7 +67,6 @@ export default function AboutComponent({summary, editable = false}) {
       console.error("Failed to update bio:", error);
       alert("Error updating bio");
     }
-
   };
 
   return (
@@ -91,7 +88,7 @@ export default function AboutComponent({summary, editable = false}) {
                 // onBlur={toggleEditMode}
               />
               <View style={styles.saveButtonContainer}>
-                <BlueButton title="Save" onPress={updateBio}/>
+                <BlueButton title="Save" onPress={updateBio} />
               </View>
             </>
           ) : (

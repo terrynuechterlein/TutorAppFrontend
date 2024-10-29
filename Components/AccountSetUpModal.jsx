@@ -33,7 +33,7 @@ const AccountSetupModal = ({isVisible, onClose}) => {
       school,
       major,
     };
-    const initialSetupUrl = `http://192.168.0.48:5016/api/tutors/${userId}/initialSetup`; // Adjusted to the new endpoint
+    const initialSetupUrl = `http://172.20.20.20:5016/api/tutors/${userId}/initialSetup`; 
 
     try {
       const response = await fetch(initialSetupUrl, {
@@ -46,7 +46,7 @@ const AccountSetupModal = ({isVisible, onClose}) => {
 
       if (response.ok) {
         console.log("Initial setup completed successfully.");
-        onClose(); // Close the modal upon successful update
+        onClose(); 
       } else {
         console.error("Failed to complete initial setup.");
       }
@@ -153,14 +153,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
-    width: "100%", 
+    width: "100%",
   },
   inputLabel: {
     color: "#fff",
-    minWidth: 80, 
+    minWidth: 80,
   },
   input: {
-    flex: 1, 
+    flex: 1,
     height: 40,
     borderColor: "#ff8c00",
     borderWidth: 1,
@@ -169,11 +169,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   modalView: {
-    width: "95%", 
+    width: "95%",
     padding: 20,
     borderRadius: 10,
     alignItems: "center",
-    alignSelf: "center", 
+    alignSelf: "center",
   },
   dotContainer: {
     flexDirection: "row",

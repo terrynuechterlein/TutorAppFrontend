@@ -1,21 +1,40 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
-const ServiceCard = ({ service }) => {
+const ServiceCard = ({ service, onDelete }) => {
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Service",
+      "Are you sure you want to delete this service?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Yes", onPress: () => onDelete(service.id) },
+      ],
+      { cancelable: true }
+    );
+  };
+
   return (
     <View style={styles.card}>
+      {/* Delete Button */}
+      <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+        <AntDesign name="close" size={20} color="#ff0000" />
+      </TouchableOpacity>
+
+      {/* Service Title and Description */}
       <Text style={styles.title}>{service.title}</Text>
       <Text style={styles.description}>{service.description}</Text>
-      <Text style={styles.price}>${service.price.toFixed(2)}</Text>
+
+      {/* Tiers */}
       {service.tiers && service.tiers.length > 0 && (
         <View style={styles.tiers}>
-          <Text style={styles.tiersHeader}>Tiers:</Text>
-          {service.tiers.map((tier) => (
+          {service.tiers.map((tier, index) => (
             <View key={tier.id} style={styles.tier}>
+              <Text style={styles.tierHeader}>Tier {index + 1}</Text>
               <Text style={styles.tierTitle}>{tier.title}</Text>
-              <Text style={styles.tierPrice}>
-                ${tier.price.toFixed(2)}
-              </Text>
+              <Text style={styles.tierDescription}>{tier.description}</Text>
+              <Text style={styles.tierPrice}>${tier.price.toFixed(2)}</Text>
             </View>
           ))}
         </View>
@@ -26,6 +45,7 @@ const ServiceCard = ({ service }) => {
 
 const styles = StyleSheet.create({
   card: {
+    position: "relative",
     backgroundColor: "#fff",
     padding: 15,
     borderRadius: 10,
@@ -36,9 +56,16 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
   },
+  deleteButton: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    zIndex: 10,
+  },
   title: {
     fontSize: 18,
     fontWeight: "bold",
+    marginTop: 10,
     marginBottom: 5,
   },
   description: {
@@ -46,33 +73,32 @@ const styles = StyleSheet.create({
     color: "#555",
     marginBottom: 10,
   },
-  price: {
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 10,
-  },
   tiers: {
     marginTop: 10,
   },
-  tiersHeader: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 5,
-  },
   tier: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    marginBottom: 15,
+  },
+  tierHeader: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 5,
   },
   tierTitle: {
     fontSize: 14,
+    fontWeight: "600",
     color: "#555",
+    marginBottom: 3,
+  },
+  tierDescription: {
+    fontSize: 13,
+    color: "#777",
+    marginBottom: 3,
   },
   tierPrice: {
     fontSize: 14,
-    color: "#555",
+    color: "#333",
   },
 });
 

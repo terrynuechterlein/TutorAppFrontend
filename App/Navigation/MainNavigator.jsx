@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
-import {useSelector} from "react-redux"; // Import useSelector
+import {useSelector} from "react-redux"; 
 import AuthStack from "./AuthStack";
 import AppTabs from "./AppTabs";
 import EditProfile from "../Screens/EditProfileScreen";

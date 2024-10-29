@@ -24,7 +24,7 @@ import {useFocusEffect} from "@react-navigation/native";
 import {faSchool} from "@fortawesome/free-solid-svg-icons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import * as SecureStore from "expo-secure-store"; // Import SecureStore
+import * as SecureStore from "expo-secure-store"; 
 import {useSelector} from "react-redux";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import IconRow from "../../Components/IconRow";

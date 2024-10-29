@@ -39,8 +39,6 @@ export default function BecomeTutor({ navigation }) {
         }
       );
 
-      console.log("Response status:", response.status); // Log response status
-
       if (response.ok) {
         Alert.alert(
           "Verification Email Sent",
@@ -49,11 +47,9 @@ export default function BecomeTutor({ navigation }) {
         navigation.goBack();
       } else {
         const errorData = await response.text();
-        console.log("Error data:", errorData); // Log any error data
         Alert.alert("Error", errorData || "Failed to send verification email.");
       }
     } catch (error) {
-      console.error("Error occurred:", error); // Log full error message
       Alert.alert("Error", "An unexpected error occurred.");
     }
   };

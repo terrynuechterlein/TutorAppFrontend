@@ -22,8 +22,8 @@ export default function ProfileModal({ isVisible, onClose, onImageTaken }) {
     // Launch the image library to choose an image
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true, // Allow editing
-      aspect: [4, 3],      // Aspect ratio
+      allowsEditing: true,
+      aspect: [4, 3],     
       quality: 1,          // Highest quality
     });
     
@@ -46,14 +46,14 @@ export default function ProfileModal({ isVisible, onClose, onImageTaken }) {
   
     // Launch the camera with the following settings
     const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true, // Allow editing
-      aspect: [4, 3],      // Aspect ratio
-      quality: 1,          // Highest quality
+      allowsEditing: true, 
+      aspect: [4, 3],     
+      quality: 1,    
     });
   
     if (!result.cancelled) {
-      onClose(); // Close the modal
-      onImageTaken(result.uri); // Send the taken image back to the profile screen
+      onClose(); 
+      onImageTaken(result.uri); 
     }
   };
   

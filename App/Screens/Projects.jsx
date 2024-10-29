@@ -26,7 +26,7 @@ export default function Projects({ navigation }) {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch("http://192.168.0.48:5016/api/projects");
+        const response = await fetch("http://172.20.20.20:5016/api/projects");
         if (response.ok) {
           const data = await response.json();
           setProjects(data);
@@ -48,7 +48,7 @@ export default function Projects({ navigation }) {
   const handleRequestToJoin = async (projectId) => {
     try {
       const response = await fetch(
-        `http://192.168.0.48:5016/api/projects/${projectId}/requestToJoin`,
+        `http://172.20.20.20:5016/api/projects/${projectId}/requestToJoin`,
         {
           method: "POST",
           headers: {
@@ -79,7 +79,7 @@ export default function Projects({ navigation }) {
 
     return (
       <View style={styles.projectCardContainer}>
-        {/* ImageBackground component to set the background image
+        {/* ImageBackground component to set the background image */}
         <ImageBackground
           source={require("../../assets/Projects/tech7.png")} 
           style={styles.imageBackground}
@@ -93,7 +93,7 @@ export default function Projects({ navigation }) {
             ]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-          > */}
+          >
 
         {/* ImageBackground component to set the background image */}
         {/* <ImageBackground
@@ -246,7 +246,7 @@ export default function Projects({ navigation }) {
             end={{ x: 1, y: 1 }}
           > */}
 
-        <ImageBackground
+        {/* <ImageBackground
           source={require("../../assets/Projects/Fashion.png")}
           style={styles.imageBackground}
           resizeMode="cover"
@@ -259,7 +259,7 @@ export default function Projects({ navigation }) {
             ]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-          >
+          > */}
 
         {/* <ImageBackground
           source={require("../../assets/Projects/Other.jpg")}
@@ -389,8 +389,7 @@ const styles = StyleSheet.create({
   },
   projectCardContent: {
     padding: 15,
-    flex: 1, // Makes sure the content takes up all the available space in the card
-
+    flex: 1, 
     minHeight: 280,
   },
   projectName: {
@@ -438,10 +437,10 @@ const styles = StyleSheet.create({
   },
   requestsText: {
     fontSize: 14,
-    fontWeight: "bold", // Make the text bold
+    fontWeight: "bold",
     color: "#ffd700",
-    alignSelf: "center", // Center the text horizontally
-    marginTop: 10, // Add margin above the text to separate it from the button
+    alignSelf: "center", 
+    marginTop: 10, 
   },
   floatingButton: {
     backgroundColor: COLORS.yellow,
@@ -460,11 +459,10 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   requestContainer: {
-    position: "absolute", // Absolute positioning to control the placement
-    bottom: -5, // Move the button and text closer to the bottom of the card
+    position: "absolute", 
+    bottom: -5, 
     left: 0,
     right: 0,
-    // alignItems: "center", // Center the button and text horizontally
     paddingHorizontal: 15,
   },
 });

@@ -1,3 +1,21 @@
+const lightTheme = {
+  background: "#FFFFFF",
+  text: "#222222",
+  primary: "#007260",
+  secondary: "#39B68D",
+  lightGray: "#E5E5E5",
+  gray: "#CCCCCC",
+};
+
+const darkTheme = {
+  background: "#121212",
+  text: "#FFFFFF",
+  primary: "#1DB954",
+  secondary: "#1ED760",
+  lightGray: "#2C2C2C",
+  gray: "#555555",
+};
+
 const COLORS = {
   white: "#FFFFFF",
   black: "#222222",
@@ -20,6 +38,10 @@ const COLORS = {
   green: "#3f9c43",
   sand:"#e6d6a2",
   red: "#ce2027",
+  light: lightTheme,
+  dark: darkTheme,
 }
 
 export default COLORS;
+
+

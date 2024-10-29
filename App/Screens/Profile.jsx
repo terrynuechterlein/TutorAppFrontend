@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Keyboard,
+  FlatList,
   Linking,
 } from "react-native";
 import Button, {
@@ -20,26 +21,28 @@ import Button, {
 import ProfileStats from "../../Components/ProfileStats";
 import FlashMessage from "react-native-flash-message";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { useFocusEffect } from "@react-navigation/native";
-import { faSchool } from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
+import {useFocusEffect} from "@react-navigation/native";
+import {faSchool} from "@fortawesome/free-solid-svg-icons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import * as SecureStore from "expo-secure-store"; // Import SecureStore
+import * as SecureStore from "expo-secure-store";
 import * as DocumentPicker from "expo-document-picker";
-import { useSelector } from "react-redux";
+import {useSelector} from "react-redux";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import IconRow from "../../Components/IconRow";
 import ProfileCategories from "../../Components/ProfileCategories";
 import AboutComponent from "../../Components/AboutComponent";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { MaterialIcons } from "@expo/vector-icons";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import {MaterialIcons} from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
-import { WebView } from "react-native-webview";
+import {WebView} from "react-native-webview";
 import DocumentScanner from "react-native-document-scanner-plugin";
 import ServiceCard from "../../Components/ServiceCard";
+import CreateServiceModal from "../../Components/CreateServicesModal";
+import useTheme from "../Hooks/useTheme";
 
-export default function Profile({ navigation }) {
+export default function Profile({navigation}) {
   const [bio, setBio] = useState("");
   const [profileImage, setProfileImage] = useState(null);
   const [bannerImage, setBannerImage] = useState(null);
@@ -63,12 +66,10 @@ export default function Profile({ navigation }) {
   const [resumeLocalUri, setResumeLocalUri] = useState(null);
   const [services, setServices] = useState([]);
   const [isServiceModalVisible, setIsServiceModalVisible] = useState(false);
-  const [serviceTitle, setServiceTitle] = useState("");
-  const [serviceDescription, setServiceDescription] = useState("");
-  const [servicePrice, setServicePrice] = useState("");
-  const [tiers, setTiers] = useState([]);
 
-  const userId = useSelector((state) => state.auth.userId);
+  const {userId, token} = useSelector((state) => state.auth);
+
+  const {themeState, themeColors} = useTheme();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -80,7 +81,7 @@ export default function Profile({ navigation }) {
 
         try {
           const response = await fetch(
-            `http://192.168.0.48:5016/api/tutors/${userId}/profile`
+            `http://172.20.20.20:5016/api/tutors/${userId}/profile`
           );
           if (response.ok) {
             const data = await response.json();
@@ -124,14 +125,14 @@ export default function Profile({ navigation }) {
 
     try {
       const response = await fetch(
-        `http://192.168.0.48:5016/api/tutors/${userId}/profileImage`
+        `http://172.20.20.20:5016/api/tutors/${userId}/profileImage`
       );
       if (response.ok) {
         const data = await response.json();
         if (data.imageUrl) {
-          setProfileImage({ uri: data.imageUrl });
+          setProfileImage({uri: data.imageUrl});
         } else {
-          setProfileImage(require("../../assets/penguin.png")); // Set default image if URL is null/undefined
+          setProfileImage(require("../../assets/penguin.png")); 
         }
       } else {
         console.error("Failed to fetch profile image");
@@ -151,14 +152,14 @@ export default function Profile({ navigation }) {
 
     try {
       const response = await fetch(
-        `http://192.168.0.48:5016/api/tutors/${userId}/bannerImage`
+        `http://172.20.20.20:5016/api/tutors/${userId}/bannerImage`
       );
       if (response.ok) {
         const data = await response.json();
         if (data.imageUrl) {
-          setBannerImage({ uri: data.imageUrl });
+          setBannerImage({uri: data.imageUrl});
         } else {
-          setBannerImage(require("../../assets/Study.png")); // Default banner image
+          setBannerImage(require("../../assets/Study.png")); 
         }
       } else {
         console.error("Failed to fetch banner image");
@@ -173,7 +174,7 @@ export default function Profile({ navigation }) {
   const fetchUserResume = async () => {
     try {
       const response = await fetch(
-        `http://192.168.0.48:5016/api/tutors/${userId}/resume`
+        `http://172.20.20.20:5016/api/tutors/${userId}/resume`
       );
       if (response.ok) {
         const data = await response.json();
@@ -193,10 +194,10 @@ export default function Profile({ navigation }) {
           "Replace Resume",
           "Do you want to replace your existing resume?",
           [
-            { text: "Cancel", style: "cancel" },
-            { text: "Yes", onPress: () => scanDocument() },
+            {text: "Cancel", style: "cancel"},
+            {text: "Yes", onPress: () => scanDocument()},
           ],
-          { cancelable: true }
+          {cancelable: true}
         );
       } else {
         scanDocument();
@@ -208,7 +209,7 @@ export default function Profile({ navigation }) {
 
   const scanDocument = async () => {
     try {
-      const { scannedImages } = await DocumentScanner.scanDocument({
+      const {scannedImages} = await DocumentScanner.scanDocument({
         letUserAdjustCrop: true,
         maxNumDocuments: 1,
       });
@@ -224,7 +225,7 @@ export default function Profile({ navigation }) {
         });
 
         const response = await fetch(
-          `http://192.168.0.48:5016/api/tutors/${userId}/uploadResume`,
+          `http://172.20.20.20:5016/api/tutors/${userId}/uploadResume`,
           {
             method: "PUT",
             body: formData,
@@ -253,6 +254,28 @@ export default function Profile({ navigation }) {
     }
   }, [resumeUrl]);
 
+  useEffect(() => {
+    if (activeTab === "Services") {
+      fetchServices();
+    }
+  }, [activeTab]);
+
+  const fetchServices = async () => {
+    try {
+      const response = await fetch(
+        `http://172.20.20.20:5016/api/tutors/${userId}/services`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setServices(data);
+      } else {
+        console.error("Failed to fetch services");
+      }
+    } catch (error) {
+      console.error("Error fetching services:", error);
+    }
+  };
+
   const handleSettingsPress = () => {
     navigation.navigate("SettingsScreen");
   };
@@ -267,95 +290,36 @@ export default function Profile({ navigation }) {
     });
   };
 
-  useEffect(() => {
-    if (activeTab === "Services") {
-      fetchServices();
-    }
-  }, [activeTab]);
-
-  const fetchServices = async () => {
+  // Handle Delete Service
+  const handleDeleteService = async (serviceId) => {
     try {
       const response = await fetch(
-        `http://192.168.0.48:5016/api/tutors/${userId}/services`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setServices(data);
-      } else {
-        console.error("Failed to fetch services");
-      }
-    } catch (error) {
-      console.error("Error fetching services:", error);
-    }
-  };
-
-  const addTier = () => {
-    setTiers([...tiers, { title: "", price: "" }]);
-  };
-
-  const updateTierTitle = (index, text) => {
-    const newTiers = [...tiers];
-    newTiers[index].title = text;
-    setTiers(newTiers);
-  };
-
-  const updateTierPrice = (index, text) => {
-    const newTiers = [...tiers];
-    newTiers[index].price = text;
-    setTiers(newTiers);
-  };
-
-  const removeTier = (index) => {
-    const newTiers = [...tiers];
-    newTiers.splice(index, 1);
-    setTiers(newTiers);
-  };
-
-  const handleSaveService = async () => {
-    if (!serviceTitle || !serviceDescription || !servicePrice) {
-      Alert.alert("Please fill in all required fields");
-      return;
-    }
-
-    const serviceData = {
-      title: serviceTitle,
-      description: serviceDescription,
-      price: parseFloat(servicePrice),
-      tiers: tiers.map((tier) => ({
-        title: tier.title,
-        price: parseFloat(tier.price),
-      })),
-    };
-
-    try {
-      const response = await fetch(
-        `http://192.168.0.48:5016/api/tutors/${userId}/services`,
+        `http://172.20.20.20:5016/api/tutors/${userId}/services/${serviceId}`,
         {
-          method: "POST",
+          method: "DELETE",
           headers: {
-            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(serviceData),
         }
       );
 
       if (response.ok) {
-        const newService = await response.json();
-        setServices([...services, newService]);
-        setIsServiceModalVisible(false);
-        setServiceTitle("");
-        setServiceDescription("");
-        setServicePrice("");
-        setTiers([]);
+        // Remove the service from the state
+        setServices(services.filter((service) => service.id !== serviceId));
+        Alert.alert("Service deleted successfully.");
       } else {
-        console.error("Failed to create service");
+        const errorData = await response.json();
+        Alert.alert(
+          "Failed to delete service",
+          errorData.message || "Unknown error"
+        );
+        console.error("Failed to delete service");
       }
     } catch (error) {
-      console.error("Error creating service:", error);
+      console.error("Error deleting service:", error);
     }
   };
 
-  // Define tab content
   let tabContent = null;
 
   if (activeTab === "Resume") {
@@ -366,7 +330,7 @@ export default function Profile({ navigation }) {
       tabContent = (
         <View style={styles.resumeContainer}>
           <Text style={styles.resumeText}>Your Resume:</Text>
-          <Image source={{ uri: resumeLocalUri }} style={styles.resumeImage} />
+          <Image source={{uri: resumeLocalUri}} style={styles.resumeImage} />
         </View>
       );
     } else if (
@@ -378,7 +342,7 @@ export default function Profile({ navigation }) {
       tabContent = (
         <View style={styles.resumeContainer}>
           <Text style={styles.resumeText}>Your Resume:</Text>
-          <Image source={{ uri: resumeUrl }} style={styles.resumeImage} />
+          <Image source={{uri: resumeUrl}} style={styles.resumeImage} />
         </View>
       );
     } else {
@@ -386,8 +350,7 @@ export default function Profile({ navigation }) {
         <View style={styles.addResumeContainer}>
           <TouchableOpacity
             onPress={handleResumeUpload}
-            style={styles.plusIcon}
-          >
+            style={styles.plusIcon}>
             <AntDesign name="pluscircleo" size={50} color="#ff8c00" />
           </TouchableOpacity>
           <Text style={styles.addResumeText}>Scan your resume</Text>
@@ -397,15 +360,36 @@ export default function Profile({ navigation }) {
   } else if (activeTab === "Projects") {
     tabContent = (
       <View style={styles.projectsContainer}>
-        {/* Add your projects content here */}
         <Text style={styles.projectsText}>Projects content goes here</Text>
       </View>
     );
   } else if (activeTab === "Services") {
     tabContent = (
       <View style={styles.servicesContainer}>
-        {/* Add your services content here */}
-        <Text style={styles.servicesText}>Services content goes here</Text>
+        <TouchableOpacity
+          style={styles.addServiceButton}
+          onPress={() => setIsServiceModalVisible(true)}>
+          <AntDesign name="pluscircleo" size={50} color="#ff8c00" />
+          <Text style={styles.addServiceText}>Add a service</Text>
+        </TouchableOpacity>
+
+        {/* List of Services */}
+        <FlatList
+          data={services}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({item}) => (
+            <ServiceCard service={item} onDelete={handleDeleteService} />
+          )}
+          contentContainerStyle={styles.serviceList}
+        />
+
+        <CreateServiceModal
+          isVisible={isServiceModalVisible}
+          onClose={() => setIsServiceModalVisible(false)}
+          userId={userId}
+          services={services}
+          setServices={setServices}
+        />
       </View>
     );
   }
@@ -420,17 +404,15 @@ export default function Profile({ navigation }) {
 
   return (
     <KeyboardAwareScrollView
-      style={{ flex: 1 }}
-      resetScrollToCoords={{ x: 0, y: 0 }}
+      style={{flex: 1}}
+      resetScrollToCoords={{x: 0, y: 0}}
       scrollEnabled={true}
       extraHeight={200}
-      enableOnAndroid={true}
-    >
+      enableOnAndroid={true}>
       <View style={styles.bannerContainer}>
         <TouchableOpacity
           onPress={handleSettingsPress}
-          style={[styles.iconWrapper, styles.gearIconWrapper]}
-        >
+          style={[styles.iconWrapper, styles.gearIconWrapper]}>
           <FontAwesome name="gear" size={24} color="#FFF" />
         </TouchableOpacity>
         <Image
@@ -659,5 +641,24 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 600,
     resizeMode: "contain",
+  },
+  servicesContainer: {
+    flex: 1,
+    paddingTop: 20,
+  },
+  addServiceButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  addServiceText: {
+    fontSize: 18,
+    color: "#333",
+    fontWeight: "500",
+    marginLeft: 10,
+  },
+  serviceList: {
+    paddingBottom: 20,
   },
 });

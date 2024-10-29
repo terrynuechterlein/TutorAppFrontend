@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   Text,
-  SafeAreaView, 
+  SafeAreaView,
 } from "react-native";
 import {Picker} from "@react-native-picker/picker";
 import {useSelector} from "react-redux";
@@ -15,10 +15,9 @@ import ProfileModal from "../../Components/ProfileModal";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import COLORS from "../../Constants/colors";
 import BannerModal from "../../Components/BannerModal";
-import { faDiscord } from '@fortawesome/free-brands-svg-icons';
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { fetchUserDetails } from "../../Utilities/fetchUserDetails";
-
+import {faDiscord} from "@fortawesome/free-brands-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
+import {fetchUserDetails} from "../../Utilities/fetchUserDetails";
 
 import {Animated} from "react-native";
 
@@ -49,17 +48,17 @@ const EditProfileScreen = ({navigation, route}) => {
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      const userProfile = await fetchUserDetails(userId); 
-      if(userProfile) {
-        setUserName(userProfile.userName || '');
-        setWebsite(userProfile.website || '');
-        setSchool(userProfile.school || '');
-        setGrade(userProfile.grade || '');
-        setMajor(userProfile.major || '');
-        setYoutubeURL(userProfile.youtubeUrl || '');
-        setTwitchURL(userProfile.twitchUrl || '');
-        setDiscordURL(userProfile.discordUrl || '');
-        setLinkedinURL(userProfile.linkedInUrl || '');
+      const userProfile = await fetchUserDetails(userId);
+      if (userProfile) {
+        setUserName(userProfile.userName || "");
+        setWebsite(userProfile.website || "");
+        setSchool(userProfile.school || "");
+        setGrade(userProfile.grade || "");
+        setMajor(userProfile.major || "");
+        setYoutubeURL(userProfile.youtubeUrl || "");
+        setTwitchURL(userProfile.twitchUrl || "");
+        setDiscordURL(userProfile.discordUrl || "");
+        setLinkedinURL(userProfile.linkedInUrl || "");
       }
     };
     fetchUserProfile();
@@ -73,23 +72,23 @@ const EditProfileScreen = ({navigation, route}) => {
 
     try {
       const response = await fetch(
-        `http://192.168.0.48:5016/api/tutors/${userId}/profileImage`
+        `http://172.20.20.20:5016/api/tutors/${userId}/profileImage`
       );
       if (response.ok) {
         const data = await response.json();
-        console.log("Profile Image URL:", data.imageUrl); 
+        console.log("Profile Image URL:", data.imageUrl);
         if (data.imageUrl) {
           setProfileImage({uri: data.imageUrl});
         } else {
-          setProfileImage(require("../../assets/penguin.png")); 
+          setProfileImage(require("../../assets/penguin.png"));
         }
       } else {
         console.error("Failed to fetch profile image");
-        setProfileImage(require("../../assets/penguin.png")); 
+        setProfileImage(require("../../assets/penguin.png"));
       }
     } catch (error) {
       console.error("Error fetching profile image:", error);
-      setProfileImage(require("../../assets/penguin.png")); 
+      setProfileImage(require("../../assets/penguin.png"));
     }
   };
 
@@ -101,14 +100,14 @@ const EditProfileScreen = ({navigation, route}) => {
 
     try {
       const response = await fetch(
-        `http://192.168.0.48:5016/api/tutors/${userId}/bannerImage`
+        `http://172.20.20.20:5016/api/tutors/${userId}/bannerImage`
       );
       if (response.ok) {
         const data = await response.json();
         if (data.imageUrl) {
           setBannerImage({uri: data.imageUrl});
         } else {
-          setBannerImage(require("../../assets/Study.png")); 
+          setBannerImage(require("../../assets/Study.png"));
         }
       } else {
         console.error("Failed to fetch banner image");
@@ -142,7 +141,7 @@ const EditProfileScreen = ({navigation, route}) => {
 
     try {
       const response = await fetch(
-        `http://192.168.0.48:5016/api/tutors/${userId}/updateProfile`,
+        `http://172.20.20.20:5016/api/tutors/${userId}/updateProfile`,
         {
           method: "PUT",
           headers: {
@@ -180,7 +179,7 @@ const EditProfileScreen = ({navigation, route}) => {
   };
 
   const goBack = () => {
-    navigation.goBack(); 
+    navigation.goBack();
   };
 
   const fadeIn = new Animated.Value(0);
@@ -194,13 +193,13 @@ const EditProfileScreen = ({navigation, route}) => {
   }, []);
 
   const handleImageTaken = (uri) => {
-    setProfileImage({uri}); 
-    setIsModalVisible(false); 
+    setProfileImage({uri});
+    setIsModalVisible(false);
   };
 
   const handleBannerImageTaken = (uri) => {
     console.log("Banner image URI passed to EditProfileScreen:", uri);
-    setBannerImage({uri}); 
+    setBannerImage({uri});
     setIsBannerModalVisible(false);
   };
 
@@ -217,7 +216,7 @@ const EditProfileScreen = ({navigation, route}) => {
 
     try {
       const response = await fetch(
-        `http://192.168.0.48:5016/api/tutors/${userId}/uploadProfilePicture`,
+        `http://172.20.20.20:5016/api/tutors/${userId}/uploadProfilePicture`,
         {
           method: "POST",
           headers: {
@@ -255,7 +254,7 @@ const EditProfileScreen = ({navigation, route}) => {
 
     try {
       const response = await fetch(
-        `http://192.168.0.48:5016/api/tutors/${userId}/uploadBannerImage`,
+        `http://172.20.20.20:5016/api/tutors/${userId}/uploadBannerImage`,
         {
           method: "POST",
           headers: {
@@ -361,55 +360,64 @@ const EditProfileScreen = ({navigation, route}) => {
         <View style={styles.sectionContainer}>
           <Text style={styles.personalInfoTitle}>Social Media</Text>
           <View style={styles.inputGroup}>
-          <View style={styles.inputContainer}>
-            <View style={styles.inputTitle}>
-            <Ionicons name="logo-youtube" size={12} color={'red'}></Ionicons>
-            <Text style={styles.nameTitle}>Youtube URL</Text>
+            <View style={styles.inputContainer}>
+              <View style={styles.inputTitle}>
+                <Ionicons
+                  name="logo-youtube"
+                  size={12}
+                  color={"red"}></Ionicons>
+                <Text style={styles.nameTitle}>Youtube URL</Text>
+              </View>
+              <TextInput
+                placeholder="Youtube"
+                value={youtubeURL}
+                onChangeText={setYoutubeURL}
+                style={styles.input}
+              />
             </View>
-            <TextInput
-              placeholder="Youtube"
-              value={youtubeURL}
-              onChangeText={setYoutubeURL}
-              style={styles.input}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <View style={styles.inputTitle}>
-            <Ionicons name="logo-twitch" size={12} color={'#6b4ba1'}></Ionicons>
-            <Text style={styles.nameTitle}>Twitch URL</Text>
+            <View style={styles.inputContainer}>
+              <View style={styles.inputTitle}>
+                <Ionicons
+                  name="logo-twitch"
+                  size={12}
+                  color={"#6b4ba1"}></Ionicons>
+                <Text style={styles.nameTitle}>Twitch URL</Text>
+              </View>
+              <TextInput
+                placeholder="Twitch"
+                value={twitchURL}
+                onChangeText={setTwitchURL}
+                style={styles.input}
+              />
             </View>
-            <TextInput
-              placeholder="Twitch"
-              value={twitchURL}
-              onChangeText={setTwitchURL}
-              style={styles.input}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <View style={styles.inputTitle}>
-            <FontAwesomeIcon icon={faDiscord} size={12} color="#7289da" />
-            <Text style={styles.nameTitle}>Discord URL</Text>
+            <View style={styles.inputContainer}>
+              <View style={styles.inputTitle}>
+                <FontAwesomeIcon icon={faDiscord} size={12} color="#7289da" />
+                <Text style={styles.nameTitle}>Discord URL</Text>
+              </View>
+              <TextInput
+                placeholder="Discord"
+                value={discordURL}
+                onChangeText={setDiscordURL}
+                style={styles.input}
+              />
             </View>
-            <TextInput
-              placeholder="Discord"
-              value={discordURL}
-              onChangeText={setDiscordURL}
-              style={styles.input}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <View style={styles.inputTitle}>
-            <Ionicons name="logo-linkedin" size={12} color={'#0077B5'}></Ionicons>
-            <Text style={styles.nameTitle}>LinkedIn URL</Text>
+            <View style={styles.inputContainer}>
+              <View style={styles.inputTitle}>
+                <Ionicons
+                  name="logo-linkedin"
+                  size={12}
+                  color={"#0077B5"}></Ionicons>
+                <Text style={styles.nameTitle}>LinkedIn URL</Text>
+              </View>
+              <TextInput
+                placeholder="LinkedIn"
+                value={linkedinURL}
+                onChangeText={setLinkedinURL}
+                style={styles.input}
+              />
             </View>
-            <TextInput
-              placeholder="LinkedIn"
-              value={linkedinURL}
-              onChangeText={setLinkedinURL}
-              style={styles.input}
-            />
           </View>
-        </View>
         </View>
 
         <View style={styles.sectionContainer}>
@@ -473,7 +481,6 @@ const styles = StyleSheet.create({
     marginTop: -50,
     marginBottom: 70,
     overflow: "hidden",
-
   },
   profileImage: {
     width: 100,
@@ -516,7 +523,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   inputTitle: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 5,
   },
   characterLimit: {
@@ -579,7 +586,7 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff", 
+    backgroundColor: "#fff",
   },
 });
 export default EditProfileScreen;
